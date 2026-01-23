@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Images - EduFlora</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .image-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        .image-card img { width: 100%; height: 200px; object-fit: contain; border: 1px solid #eee; }
+        .image-card h3 { margin: 10px 0 5px 0; }
+        .status { padding: 5px 10px; border-radius: 4px; font-size: 12px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>EduFlora - Test Images</h1>
+    <p>Testing all image paths and resources</p>
+
+    <div class="image-grid">
+        <div class="image-card">
+            <h3>Default Flora</h3>
+            <img src="assets/images/default-flora.svg" alt="Default Flora" 
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Default Fauna</h3>
+            <img src="assets/images/default-fauna.svg" alt="Default Fauna"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Rafflesia</h3>
+            <img src="assets/images/rafflesia.svg" alt="Rafflesia"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Nepenthes</h3>
+            <img src="assets/images/nepenthes.svg" alt="Nepenthes"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Amorphophallus</h3>
+            <img src="assets/images/amorphophallus.svg" alt="Amorphophallus"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Orangutan</h3>
+            <img src="assets/images/orangutan.svg" alt="Orangutan"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Harimau Sumatera</h3>
+            <img src="assets/images/harimau-sumatera.svg" alt="Harimau Sumatera"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+
+        <div class="image-card">
+            <h3>Komodo</h3>
+            <img src="assets/images/komodo.svg" alt="Komodo"
+                 onload="this.nextElementSibling.className='status success'; this.nextElementSibling.textContent='✓ Loaded'"
+                 onerror="this.nextElementSibling.className='status error'; this.nextElementSibling.textContent='✗ Failed'">
+            <div class="status">Loading...</div>
+        </div>
+    </div>
+
+    <h2>Admin Resources Test</h2>
+    <div class="image-card">
+        <h3>Admin CSS</h3>
+        <div id="css-test" class="status">Testing...</div>
+        <script>
+            // Test CSS loading
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'assets/css/admin.css';
+            link.onload = () => {
+                document.getElementById('css-test').className = 'status success';
+                document.getElementById('css-test').textContent = '✓ Admin CSS Loaded';
+            };
+            link.onerror = () => {
+                document.getElementById('css-test').className = 'status error';
+                document.getElementById('css-test').textContent = '✗ Admin CSS Failed';
+            };
+            document.head.appendChild(link);
+        </script>
+    </div>
+
+    <div class="image-card">
+        <h3>Admin JS</h3>
+        <div id="js-test" class="status">Testing...</div>
+        <script>
+            // Test JS loading
+            const script = document.createElement('script');
+            script.src = 'assets/js/admin.js';
+            script.onload = () => {
+                document.getElementById('js-test').className = 'status success';
+                document.getElementById('js-test').textContent = '✓ Admin JS Loaded';
+            };
+            script.onerror = () => {
+                document.getElementById('js-test').className = 'status error';
+                document.getElementById('js-test').textContent = '✗ Admin JS Failed';
+            };
+            document.head.appendChild(script);
+        </script>
+    </div>
+
+    <h2>Directory Structure</h2>
+    <pre>
+assets/
+├── css/
+│   ├── admin.css
+│   └── style.css
+├── js/
+│   ├── admin.js
+│   └── script.js
+└── images/
+    ├── default-flora.svg
+    ├── default-fauna.svg
+    ├── rafflesia.svg
+    ├── nepenthes.svg
+    ├── amorphophallus.svg
+    ├── orangutan.svg
+    ├── harimau-sumatera.svg
+    └── komodo.svg
+    </pre>
+
+    <p><a href="admin/flora.php">→ Test Admin Flora Page</a></p>
+    <p><a href="admin/fauna.php">→ Test Admin Fauna Page</a></p>
+    <p><a href="admin/check_upload.php">→ Test Upload Configuration</a></p>
+</body>
+</html>

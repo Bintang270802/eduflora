@@ -1,0 +1,9 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#f0f9ff"/>
+  <rect x="10" y="10" width="280" height="180" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2" rx="10"/>
+  <circle cx="150" cy="70" r="25" fill="#22c55e"/>
+  <path d="M125 95 Q150 85 175 95 Q175 110 150 120 Q125 110 125 95" fill="#16a34a"/>
+  <path d="M140 120 L140 140 M135 135 L145 135" stroke="#15803d" stroke-width="3"/>
+  <text x="150" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#374151">Default Flora Image</text>
+  <text x="150" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">300 x 200 pixels</text>
+</svg>

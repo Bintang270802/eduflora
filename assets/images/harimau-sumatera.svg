@@ -1,0 +1,19 @@
+<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#fffbeb"/>
+  <rect x="10" y="10" width="280" height="180" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" rx="10"/>
+  <ellipse cx="150" cy="120" rx="50" ry="25" fill="#f59e0b"/>
+  <ellipse cx="150" cy="90" rx="35" ry="20" fill="#f59e0b"/>
+  <circle cx="140" cy="85" r="2" fill="#1f2937"/>
+  <circle cx="160" cy="85" r="2" fill="#1f2937"/>
+  <path d="M145 90 L155 90" stroke="#1f2937" stroke-width="2"/>
+  <ellipse cx="125" cy="80" rx="8" ry="12" fill="#f59e0b"/>
+  <ellipse cx="175" cy="80" rx="8" ry="12" fill="#f59e0b"/>
+  <path d="M120 100 L130 95 M140 105 L150 100 M160 105 L170 100 M180 100 L190 95" stroke="#1f2937" stroke-width="2"/>
+  <path d="M120 120 L130 115 M140 125 L150 120 M160 125 L170 120 M180 120 L190 115" stroke="#1f2937" stroke-width="2"/>
+  <ellipse cx="120" cy="140" rx="8" ry="15" fill="#f59e0b"/>
+  <ellipse cx="180" cy="140" rx="8" ry="15" fill="#f59e0b"/>
+  <ellipse cx="140" cy="145" rx="6" ry="12" fill="#f59e0b"/>
+  <ellipse cx="160" cy="145" rx="6" ry="12" fill="#f59e0b"/>
+  <path d="M200 120 Q210 115 220 120 Q215 125 210 130 Q205 125 200 120" fill="#f59e0b"/>
+  <text x="150" y="185" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#374151">Harimau Sumatera</text>
+</svg>

@@ -1,0 +1,16 @@
+Options +Indexes
+<Files "*.jpg">
+    Allow from all
+</Files>
+<Files "*.jpeg">
+    Allow from all
+</Files>
+<Files "*.png">
+    Allow from all
+</Files>
+<Files "*.gif">
+    Allow from all
+</Files>
+<Files "*.webp">
+    Allow from all
+</Files>
