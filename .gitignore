@@ -1,4 +1,9 @@
-# test files
+# fauna test files
 test_images.php
 admin/check_permissions.php
 admin/test_image_display.php
+
+# flora test files
+admin/check_flora_data.php
+admin/test_flora_images.php
+
