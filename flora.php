@@ -141,7 +141,7 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fl
                         <div class="flora-card">
                             <div class="card-image">
                                 <img src="<?php echo $flora['image']; ?>" alt="<?php echo $flora['nama']; ?>" 
-                                     onerror="this.src='assets/images/default-flora.jpg'">
+                                     onerror="this.src='assets/images/default-flora.svg'">
                                 <div class="card-overlay">
                                     <button class="btn-detail" onclick="showDetail('flora', <?php echo $flora['id']; ?>)">
                                         <i class="fas fa-eye"></i> Lihat Detail

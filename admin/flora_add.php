@@ -62,15 +62,16 @@ if ($_POST) {
         $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, 'ssssssssss', $nama, $nama_ilmiah, $deskripsi, $habitat, $habitat_detail, $asal_daerah, $status_konservasi, $manfaat, $ciri_khusus, $image_path);
     
-    if (mysqli_stmt_execute($stmt)) {
-        $success_message = "Data flora berhasil ditambahkan!";
-        // Reset form
-        $_POST = array();
-    } else {
-        $error_message = "Gagal menambahkan data flora: " . mysqli_error($conn);
+        if (mysqli_stmt_execute($stmt)) {
+            $success_message = "Data flora berhasil ditambahkan!";
+            // Reset form
+            $_POST = array();
+        } else {
+            $error_message = "Gagal menambahkan data flora: " . mysqli_error($conn);
+        }
+        
+        mysqli_stmt_close($stmt);
     }
-    
-    mysqli_stmt_close($stmt);
 }
 ?>
 

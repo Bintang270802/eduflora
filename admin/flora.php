@@ -137,10 +137,6 @@ $result = mysqli_query($conn, $query);
                             <i class="fas fa-plus"></i>
                             Tambah Flora
                         </a>
-                        <button class="btn btn-secondary" onclick="exportData()">
-                            <i class="fas fa-download"></i>
-                            Export Data
-                        </button>
                     </div>
                 </div>
 
@@ -233,7 +229,7 @@ $result = mysqli_query($conn, $query);
                                             <td><?php echo $flora['id']; ?></td>
                                             <td>
                                                 <div class="table-image">
-                                                    <img src="<?php echo $flora['image']; ?>" 
+                                                    <img src="../<?php echo $flora['image']; ?>" 
                                                          alt="<?php echo $flora['nama']; ?>"
                                                          onerror="this.src='../assets/images/default-flora.svg'">
                                                 </div>
@@ -391,11 +387,6 @@ $result = mysqli_query($conn, $query);
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
-        }
-
-        // Export data function
-        function exportData() {
-            window.open('export_flora.php', '_blank');
         }
 
         // Handle window resize

@@ -129,10 +129,6 @@ $result = mysqli_query($conn, $query);
                             <i class="fas fa-plus"></i>
                             Tambah Fauna
                         </a>
-                        <button class="btn btn-secondary" onclick="exportData()">
-                            <i class="fas fa-download"></i>
-                            Export Data
-                        </button>
                     </div>
                 </div>
 
@@ -369,11 +365,6 @@ $result = mysqli_query($conn, $query);
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
-        }
-
-        // Export data function
-        function exportData() {
-            window.open('export_fauna.php', '_blank');
         }
 
         // Auto-hide alerts
