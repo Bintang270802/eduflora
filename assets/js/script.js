@@ -116,7 +116,7 @@ function showDetail(type, id) {
                 modalBody.innerHTML = `
                     <div class="detail-content">
                         <div class="detail-header">
-                            <img src="${item.image}" alt="${item.nama}" class="detail-image">
+                            <img src="${item.image}" alt="${item.nama}" class="detail-image" onerror="this.src='assets/images/default-fauna.svg'">
                             <div class="detail-info">
                                 <h2 class="detail-title">${item.nama}</h2>
                                 <p class="detail-scientific">${item.nama_ilmiah}</p>

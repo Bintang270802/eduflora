@@ -226,7 +226,7 @@ $result = mysqli_query($conn, $query);
                                             <td><?php echo $fauna['id']; ?></td>
                                             <td>
                                                 <div class="table-image">
-                                                    <img src="<?php echo $fauna['image']; ?>" 
+                                                    <img src="../<?php echo $fauna['image']; ?>" 
                                                          alt="<?php echo $fauna['nama']; ?>"
                                                          onerror="this.src='../assets/images/default-fauna.svg'">
                                                 </div>
