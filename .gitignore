@@ -7,3 +7,12 @@ admin/test_image_display.php
 admin/check_flora_data.php
 admin/test_flora_images.php
 
+# test & debug
+admin/debug_upload.php
+admin/test_*.php
+
+# local admin css
+assets/css/admin-fix.css
+
+# uploaded images
+assets/images/*.png
