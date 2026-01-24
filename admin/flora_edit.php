@@ -33,79 +33,118 @@ $flora = mysqli_fetch_assoc($result);
 
 // Handle form submission
 if ($_POST) {
-    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
-    $nama_ilmiah = mysqli_real_escape_string($conn, $_POST['nama_ilmiah']);
-    $deskripsi = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-    $habitat = mysqli_real_escape_string($conn, $_POST['habitat']);
-    $habitat_detail = mysqli_real_escape_string($conn, $_POST['habitat_detail']);
-    $asal_daerah = mysqli_real_escape_string($conn, $_POST['asal_daerah']);
-    $status_konservasi = mysqli_real_escape_string($conn, $_POST['status_konservasi']);
-    $manfaat = mysqli_real_escape_string($conn, $_POST['manfaat']);
-    $ciri_khusus = mysqli_real_escape_string($conn, $_POST['ciri_khusus']);
+    $nama = $_POST['nama'];
+    $nama_ilmiah = $_POST['nama_ilmiah'];
+    $deskripsi = $_POST['deskripsi'];
+    $habitat = $_POST['habitat'];
+    $habitat_detail = $_POST['habitat_detail'];
+    $asal_daerah = $_POST['asal_daerah'];
+    $status_konservasi = $_POST['status_konservasi'];
+    $manfaat = $_POST['manfaat'];
+    $ciri_khusus = $_POST['ciri_khusus'];
     
     // Handle image upload
     $image_name = $flora['image']; // Keep existing image by default
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        // Get file info
+        $original_name = $_FILES['image']['name'];
+        $tmp_name = $_FILES['image']['tmp_name'];
+        $file_size = $_FILES['image']['size'];
         
-        if (in_array($file_extension, $allowed_types)) {
-            if ($_FILES['image']['size'] <= 5 * 1024 * 1024) { // 5MB limit
-                $new_image_name = 'flora_' . time() . '_' . uniqid() . '.' . $file_extension;
-                $upload_path = '../assets/images/' . $new_image_name;
-                
-                // Create directory if it doesn't exist
-                if (!is_dir('../assets/images/')) {
-                    mkdir('../assets/images/', 0755, true);
-                }
-                
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-                    // Delete old image if it exists and is not default
-                    if ($flora['image'] && 
-                        $flora['image'] != 'assets/images/default-flora.svg' && 
-                        strpos($flora['image'], 'assets/images/') === 0 && 
-                        file_exists('../' . $flora['image'])) {
-                        unlink('../' . $flora['image']);
-                    }
-                    
-                    // Update image name with relative path
-                    $image_name = 'assets/images/' . $new_image_name;
-                } else {
-                    $error_message = "Gagal mengupload gambar! Periksa permission direktori. Upload path: " . $upload_path . " | Temp file: " . $_FILES['image']['tmp_name'] . " | Error: " . $_FILES['image']['error'];
-                }
-            } else {
-                $error_message = "Ukuran gambar terlalu besar! Maksimal 5MB.";
-            }
+        // Get file extension
+        $file_extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        // Get MIME type for additional validation
+        $allowed_mime_types = [
+            'image/jpeg',
+            'image/jpg', 
+            'image/png',
+            'image/gif',
+            'image/webp'
+        ];
+        
+        $file_mime_type = '';
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $file_mime_type = finfo_file($finfo, $tmp_name);
+            finfo_close($finfo);
         } else {
-            $error_message = "Format gambar tidak didukung! Gunakan JPG, PNG, GIF, atau WebP.";
+            $file_mime_type = $_FILES['image']['type'];
+        }
+        
+        // Validate extension
+        if (!in_array($file_extension, $allowed_extensions)) {
+            $error_message = "Format gambar tidak didukung! File: '$original_name' dengan ekstensi '$file_extension'. Gunakan JPG, JPEG, PNG, GIF, atau WebP.";
+        }
+        // Validate MIME type
+        elseif (!in_array($file_mime_type, $allowed_mime_types)) {
+            $error_message = "Tipe file tidak valid! MIME type: '$file_mime_type'. Pastikan file adalah gambar yang valid.";
+        }
+        // Validate file size
+        elseif ($file_size > 5 * 1024 * 1024) {
+            $error_message = "Ukuran gambar terlalu besar! Ukuran: " . number_format($file_size / 1024 / 1024, 2) . "MB. Maksimal 5MB.";
+        }
+        // All validations passed, try upload
+        else {
+            $new_image_name = 'flora_' . time() . '_' . uniqid() . '.' . $file_extension;
+            $upload_path = '../assets/images/' . $new_image_name;
+            
+            // Create directory if it doesn't exist
+            if (!is_dir('../assets/images/')) {
+                mkdir('../assets/images/', 0755, true);
+            }
+            
+            if (move_uploaded_file($tmp_name, $upload_path)) {
+                // Delete old image if it exists and is not default
+                if ($flora['image'] && 
+                    $flora['image'] != 'assets/images/default-flora.svg' && 
+                    strpos($flora['image'], 'assets/images/') === 0 && 
+                    file_exists('../' . $flora['image'])) {
+                    unlink('../' . $flora['image']);
+                }
+                
+                // Update image name with relative path
+                $image_name = 'assets/images/' . $new_image_name;
+            } else {
+                $error_message = "Gagal mengupload gambar! Periksa permission direktori. Upload path: " . $upload_path . " | Temp file: " . $tmp_name . " | Directory writable: " . (is_writable('../assets/images/') ? 'Yes' : 'No');
+            }
         }
     }
     
     // Update data if no error
     if (empty($error_message)) {
         $update_query = "UPDATE flora SET 
-            nama = '$nama',
-            nama_ilmiah = '$nama_ilmiah',
-            deskripsi = '$deskripsi',
-            habitat = '$habitat',
-            habitat_detail = '$habitat_detail',
-            asal_daerah = '$asal_daerah',
-            status_konservasi = '$status_konservasi',
-            manfaat = '$manfaat',
-            ciri_khusus = '$ciri_khusus',
-            image = '$image_name',
+            nama = ?,
+            nama_ilmiah = ?,
+            deskripsi = ?,
+            habitat = ?,
+            habitat_detail = ?,
+            asal_daerah = ?,
+            status_konservasi = ?,
+            manfaat = ?,
+            ciri_khusus = ?,
+            image = ?,
             updated_at = NOW()
-            WHERE id = $flora_id";
+            WHERE id = ?";
         
-        if (mysqli_query($conn, $update_query)) {
+        $stmt = mysqli_prepare($conn, $update_query);
+        mysqli_stmt_bind_param($stmt, 'ssssssssssi', 
+            $nama, $nama_ilmiah, $deskripsi, $habitat, $habitat_detail, 
+            $asal_daerah, $status_konservasi, $manfaat, $ciri_khusus, 
+            $image_name, $flora_id);
+        
+        if (mysqli_stmt_execute($stmt)) {
             $success_message = "Data flora berhasil diperbarui!";
             // Refresh data
             $result = mysqli_query($conn, "SELECT * FROM flora WHERE id = $flora_id");
             $flora = mysqli_fetch_assoc($result);
         } else {
-            $error_message = "Gagal memperbarui data flora!";
+            $error_message = "Gagal memperbarui data flora: " . mysqli_error($conn);
         }
+        
+        mysqli_stmt_close($stmt);
     }
 }
 ?>
@@ -117,6 +156,7 @@ if ($_POST) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Flora - EduFlora Admin</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin-fix.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -335,7 +375,7 @@ if ($_POST) {
                                     <?php if ($flora['image']): ?>
                                         <div class="current-image">
                                             <h4>Gambar Saat Ini:</h4>
-                                            <img src="<?php echo $flora['image']; ?>" alt="<?php echo htmlspecialchars($flora['nama']); ?>">
+                                            <img src="../<?php echo $flora['image']; ?>" alt="<?php echo htmlspecialchars($flora['nama']); ?>" style="max-width: 200px; height: auto; border-radius: 8px; border: 1px solid #ddd;">
                                         </div>
                                     <?php endif; ?>
                                     
@@ -413,7 +453,6 @@ if ($_POST) {
     <script>
         // Wait for DOM to be ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize form functionality after DOM is loaded
             initializeForm();
         });
 
@@ -426,22 +465,18 @@ if ($_POST) {
                     const help = this.nextElementSibling;
                     if (help) {
                         help.textContent = `Deskripsi lengkap tentang flora (${length}/100 karakter minimum)`;
-                        
-                        if (length >= 100) {
-                            help.style.color = '#27ae60';
-                        } else {
-                            help.style.color = '#e74c3c';
-                        }
+                        help.style.color = length >= 100 ? '#27ae60' : '#e74c3c';
                     }
                 });
             }
 
-            // Check for unsaved changes
+            // Track form changes
             let formChanged = false;
             document.querySelectorAll('input, textarea, select').forEach(element => {
                 element.addEventListener('change', () => formChanged = true);
             });
 
+            // Warn before leaving with unsaved changes
             window.addEventListener('beforeunload', function(e) {
                 if (formChanged) {
                     e.preventDefault();
@@ -452,15 +487,26 @@ if ($_POST) {
             // Mark form as saved when submitted
             const form = document.querySelector('.flora-form');
             if (form) {
-                form.addEventListener('submit', () => formChanged = false);
+                form.addEventListener('submit', function(e) {
+                    const deskripsi = document.getElementById('deskripsi').value;
+                    
+                    if (deskripsi.length < 100) {
+                        e.preventDefault();
+                        alert('Deskripsi harus minimal 100 karakter!');
+                        document.getElementById('deskripsi').focus();
+                        return false;
+                    }
+                    
+                    formChanged = false;
+                });
             }
         }
+
         // Image preview functionality
         function previewImage(input) {
             const preview = document.getElementById('imagePreview');
             const previewImg = document.getElementById('previewImg');
             
-            // Check if elements exist
             if (!preview || !previewImg) {
                 console.error('Preview elements not found');
                 return;
@@ -504,7 +550,6 @@ if ($_POST) {
         // Form reset functionality
         function resetForm() {
             if (confirm('Apakah Anda yakin ingin mereset form? Semua perubahan akan hilang.')) {
-                // Store original form data
                 const originalData = {
                     nama: '<?php echo addslashes($flora['nama']); ?>',
                     nama_ilmiah: '<?php echo addslashes($flora['nama_ilmiah']); ?>',
@@ -517,7 +562,6 @@ if ($_POST) {
                     ciri_khusus: '<?php echo addslashes($flora['ciri_khusus']); ?>'
                 };
                 
-                // Reset form to original values
                 Object.keys(originalData).forEach(key => {
                     const element = document.getElementById(key);
                     if (element) {
@@ -525,62 +569,11 @@ if ($_POST) {
                     }
                 });
                 
-                // Reset image upload
                 removeImage();
-                formChanged = false;
             }
         }
 
-        // Form validation
-        document.querySelector('.flora-form').addEventListener('submit', function(e) {
-            const deskripsi = document.getElementById('deskripsi').value;
-            
-            if (deskripsi.length < 100) {
-                e.preventDefault();
-                alert('Deskripsi harus minimal 100 karakter!');
-                document.getElementById('deskripsi').focus();
-                return false;
-            }
-        });
-
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            });
-        }, 5000);
-
-        // Character counter for textarea
-        document.getElementById('deskripsi').addEventListener('input', function() {
-            const length = this.value.length;
-            const help = this.nextElementSibling;
-            help.textContent = `Deskripsi lengkap tentang flora (${length}/100 karakter minimum)`;
-            
-            if (length >= 100) {
-                help.style.color = '#27ae60';
-            } else {
-                help.style.color = '#e74c3c';
-            }
-        });
-
-        // Check for unsaved changes
-        let formChanged = false;
-        document.querySelectorAll('input, textarea, select').forEach(element => {
-            element.addEventListener('change', () => formChanged = true);
-        });
-
-        window.addEventListener('beforeunload', function(e) {
-            if (formChanged) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-
-        // Mark form as saved when submitted
-        document.querySelector('.flora-form').addEventListener('submit', () => formChanged = false);
-
-        // Close modal functionality
+        // Modal functionality
         document.querySelectorAll('.close').forEach(closeBtn => {
             closeBtn.addEventListener('click', function() {
                 this.closest('.modal').style.display = 'none';
@@ -602,6 +595,14 @@ if ($_POST) {
                 setTimeout(() => alert.remove(), 300);
             }
         });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
 
         // Mobile sidebar toggle
         function toggleSidebar() {

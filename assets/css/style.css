@@ -930,7 +930,7 @@ body {
 
 .search-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr auto;
+    grid-template-columns: 2fr 1fr 1fr auto auto;
     gap: 1rem;
     align-items: center;
 }
@@ -996,6 +996,62 @@ body {
 .search-btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-medium);
+}
+
+/* Reset buttons untuk flora dan fauna */
+.reset-btn-flora, .reset-btn-fauna {
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    text-decoration: none;
+    border: none;
+    font-size: 1rem;
+    justify-content: center;
+}
+
+.reset-btn-flora {
+    background: var(--gradient-primary);
+    color: var(--white);
+}
+
+.reset-btn-fauna {
+    background: var(--gradient-secondary);
+    color: var(--white);
+}
+
+.reset-btn-flora:hover, .reset-btn-fauna:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.reset-btn {
+    background: var(--gradient-secondary);
+    color: var(--white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.reset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    color: var(--white);
 }
 
 /* Flora Grid Section */
@@ -1159,6 +1215,10 @@ body {
     }
 
     .search-btn {
+        justify-content: center;
+    }
+
+    .reset-btn-flora, .reset-btn-fauna {
         justify-content: center;
     }
 

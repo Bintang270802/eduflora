@@ -34,24 +34,55 @@ if ($_POST) {
             mkdir($upload_dir, 0755, true);
         }
         
-        $file_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+        // Get file info
+        $original_name = $_FILES['image']['name'];
+        $tmp_name = $_FILES['image']['tmp_name'];
+        $file_size = $_FILES['image']['size'];
+        
+        // Get file extension
+        $file_extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         
-        if (in_array($file_extension, $allowed_extensions)) {
-            if ($_FILES['image']['size'] <= 5 * 1024 * 1024) { // 5MB limit
-                $new_filename = 'fauna_' . time() . '_' . uniqid() . '.' . $file_extension;
-                $upload_path = $upload_dir . $new_filename;
-                
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
-                    $image_path = 'assets/images/' . $new_filename;
-                } else {
-                    $error_message = "Gagal mengupload gambar! Periksa permission direktori. Upload path: " . $upload_path . " | Temp file: " . $_FILES['image']['tmp_name'] . " | Error: " . $_FILES['image']['error'];
-                }
-            } else {
-                $error_message = "Ukuran gambar terlalu besar! Maksimal 5MB.";
-            }
+        // Get MIME type for additional validation
+        $allowed_mime_types = [
+            'image/jpeg',
+            'image/jpg', 
+            'image/png',
+            'image/gif',
+            'image/webp'
+        ];
+        
+        $file_mime_type = '';
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $file_mime_type = finfo_file($finfo, $tmp_name);
+            finfo_close($finfo);
         } else {
-            $error_message = "Format gambar tidak didukung! Gunakan JPG, PNG, GIF, atau WebP.";
+            $file_mime_type = $_FILES['image']['type'];
+        }
+        
+        // Validate extension
+        if (!in_array($file_extension, $allowed_extensions)) {
+            $error_message = "Format gambar tidak didukung! File: '$original_name' dengan ekstensi '$file_extension'. Gunakan JPG, JPEG, PNG, GIF, atau WebP.";
+        }
+        // Validate MIME type
+        elseif (!in_array($file_mime_type, $allowed_mime_types)) {
+            $error_message = "Tipe file tidak valid! MIME type: '$file_mime_type'. Pastikan file adalah gambar yang valid.";
+        }
+        // Validate file size
+        elseif ($file_size > 5 * 1024 * 1024) {
+            $error_message = "Ukuran gambar terlalu besar! Ukuran: " . number_format($file_size / 1024 / 1024, 2) . "MB. Maksimal 5MB.";
+        }
+        // All validations passed, try upload
+        else {
+            $new_filename = 'fauna_' . time() . '_' . uniqid() . '.' . $file_extension;
+            $upload_path = $upload_dir . $new_filename;
+            
+            if (move_uploaded_file($tmp_name, $upload_path)) {
+                $image_path = 'assets/images/' . $new_filename;
+            } else {
+                $error_message = "Gagal mengupload gambar! Periksa permission direktori. Upload path: " . $upload_path . " | Temp file: " . $tmp_name . " | Directory writable: " . (is_writable($upload_dir) ? 'Yes' : 'No');
+            }
         }
     }
     
