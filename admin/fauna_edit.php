@@ -148,8 +148,6 @@ if ($_POST) {
         
         mysqli_stmt_close($stmt);
     }
-        }
-    }
 }
 ?>
 
@@ -596,6 +594,9 @@ if ($_POST) {
                 document.getElementById('deskripsi').focus();
                 return false;
             }
+            
+            // Mark form as saved when submitted
+            formChanged = false;
         });
 
         // Auto-hide alerts after 5 seconds
@@ -607,17 +608,17 @@ if ($_POST) {
         }, 5000);
 
         // Character counter for textarea
-        document.getElementById('deskripsi').addEventListener('input', function() {
-            const length = this.value.length;
-            const help = this.nextElementSibling;
-            help.textContent = `Deskripsi lengkap tentang fauna (${length}/100 karakter minimum)`;
-            
-            if (length >= 100) {
-                help.style.color = '#27ae60';
-            } else {
-                help.style.color = '#e74c3c';
-            }
-        });
+        const deskripsiField = document.getElementById('deskripsi');
+        if (deskripsiField) {
+            deskripsiField.addEventListener('input', function() {
+                const length = this.value.length;
+                const help = this.nextElementSibling;
+                if (help) {
+                    help.textContent = `Deskripsi lengkap tentang fauna (${length}/100 karakter minimum)`;
+                    help.style.color = length >= 100 ? '#27ae60' : '#e74c3c';
+                }
+            });
+        }
 
         // Check for unsaved changes
         let formChanged = false;
@@ -631,9 +632,6 @@ if ($_POST) {
                 e.returnValue = '';
             }
         });
-
-        // Mark form as saved when submitted
-        document.querySelector('.fauna-form').addEventListener('submit', () => formChanged = false);
 
         // Close modal functionality
         document.querySelectorAll('.close').forEach(closeBtn => {
