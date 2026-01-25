@@ -35,9 +35,15 @@ class AdminPanel {
         // Window resize handler
         window.addEventListener('resize', () => this.handleResize());
 
-        // Form submission handlers
+        // Form submission handlers - simplified
         document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+            // Only add loading state, don't interfere with submission
+            const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', () => {
+                    this.setButtonLoading(submitBtn, true);
+                });
+            }
         });
 
         // Button click handlers
@@ -313,14 +319,13 @@ class AdminPanel {
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
         
+        // Don't prevent form submission, just add loading state
         if (submitBtn && !submitBtn.classList.contains('btn-delete')) {
             this.setButtonLoading(submitBtn, true);
-            
-            // Remove loading state after form submission
-            setTimeout(() => {
-                this.setButtonLoading(submitBtn, false);
-            }, 2000);
         }
+        
+        // Allow form to submit normally
+        return true;
     }
 
     handleButtonClick(e) {
