@@ -9,6 +9,11 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 include '../config/database.php';
 
+// Handle success message from update
+if (isset($_GET['success']) && $_GET['success'] === 'update') {
+    $success_message = "Data fauna berhasil diperbarui!";
+}
+
 // Handle delete action
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
@@ -54,6 +59,36 @@ $result = mysqli_query($conn, $query);
     <link rel="stylesheet" href="../assets/css/admin-fix.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* FORCE TOMBOL AKSI RAPI */
+        .action-buttons {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 3px !important;
+            width: 110px !important;
+            margin: 0 auto !important;
+        }
+        .btn-view, .btn-edit, .btn-delete {
+            width: 30px !important;
+            height: 30px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 4px !important;
+            border: none !important;
+            text-decoration: none !important;
+            font-size: 11px !important;
+            flex-shrink: 0 !important;
+        }
+        .btn-view { background: #6b7280 !important; color: white !important; }
+        .btn-edit { background: #3b82f6 !important; color: white !important; }
+        .btn-delete { background: #ef4444 !important; color: white !important; }
+        .btn-view:hover { background: #4b5563 !important; color: white !important; text-decoration: none !important; }
+        .btn-edit:hover { background: #2563eb !important; color: white !important; text-decoration: none !important; }
+        .btn-delete:hover { background: #dc2626 !important; color: white !important; text-decoration: none !important; }
+        td:last-child { text-align: center !important; width: 120px !important; padding: 8px 4px !important; }
+    </style>
 </head>
 <body>
     <div class="admin-layout">

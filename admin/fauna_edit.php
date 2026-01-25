@@ -103,14 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_stmt_execute($stmt)) {
             $success_message = "Data fauna berhasil diperbarui!";
             
-            // Ambil data terbaru
-            $query = "SELECT * FROM fauna WHERE id = ?";
-            $stmt2 = mysqli_prepare($conn, $query);
-            mysqli_stmt_bind_param($stmt2, 'i', $fauna_id);
-            mysqli_stmt_execute($stmt2);
-            $result = mysqli_stmt_get_result($stmt2);
-            $fauna = mysqli_fetch_assoc($result);
-            mysqli_stmt_close($stmt2);
+            // Redirect ke halaman fauna setelah update berhasil
+            mysqli_stmt_close($stmt);
+            header('Location: fauna.php?success=update');
+            exit();
         } else {
             $error_message = "Gagal memperbarui data: " . mysqli_error($conn);
         }

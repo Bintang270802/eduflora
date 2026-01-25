@@ -303,7 +303,7 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 EduFlora. Semua hak cipta dilindungi.</p>
+                <p>&copy; 2026 EduFlora. Semua hak cipta dilindungi.</p>
             </div>
         </div>
     </footer>
