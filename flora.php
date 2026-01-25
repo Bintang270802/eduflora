@@ -104,6 +104,10 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fl
                         <i class="fas fa-search"></i>
                         <input type="text" name="search" placeholder="Cari flora berdasarkan nama atau deskripsi..." 
                                value="<?php echo htmlspecialchars($search); ?>">
+                        <a href="flora.php" class="reset-btn-flora">
+                            <i class="fas fa-undo"></i>
+                            Reset
+                        </a>
                     </div>
                     <select name="habitat">
                         <option value="">Semua Habitat</option>
@@ -127,10 +131,6 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fl
                         <i class="fas fa-search"></i>
                         Cari
                     </button>
-                    <a href="flora.php" class="reset-btn-flora">
-                        <i class="fas fa-undo"></i>
-                        Reset
-                    </a>
                 </div>
             </form>
         </div>

@@ -32,67 +32,52 @@ if (!$result || mysqli_num_rows($result) == 0) {
 $fauna = mysqli_fetch_assoc($result);
 
 // Handle form submission
-if ($_POST) {
-    $nama = $_POST['nama'];
-    $nama_ilmiah = $_POST['nama_ilmiah'];
-    $deskripsi = $_POST['deskripsi'];
-    $habitat = $_POST['habitat'];
-    $habitat_detail = $_POST['habitat_detail'];
-    $asal_daerah = $_POST['asal_daerah'];
-    $status_konservasi = $_POST['status_konservasi'];
-    $makanan = $_POST['makanan'];
-    $perilaku = $_POST['perilaku'];
-    $ciri_fisik = $_POST['ciri_fisik'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama = trim($_POST['nama'] ?? '');
+    $nama_ilmiah = trim($_POST['nama_ilmiah'] ?? '');
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $habitat = $_POST['habitat'] ?? '';
+    $habitat_detail = trim($_POST['habitat_detail'] ?? '');
+    $asal_daerah = trim($_POST['asal_daerah'] ?? '');
+    $status_konservasi = $_POST['status_konservasi'] ?? '';
+    $makanan = trim($_POST['makanan'] ?? '');
+    $perilaku = trim($_POST['perilaku'] ?? '');
+    $ciri_fisik = trim($_POST['ciri_fisik'] ?? '');
+    
+    // Validasi
+    if (empty($nama)) {
+        $error_message = "Nama fauna harus diisi!";
+    } elseif (empty($nama_ilmiah)) {
+        $error_message = "Nama ilmiah harus diisi!";
+    } elseif (empty($deskripsi)) {
+        $error_message = "Deskripsi harus diisi!";
+    } elseif (empty($habitat)) {
+        $error_message = "Habitat harus dipilih!";
+    } elseif (empty($asal_daerah)) {
+        $error_message = "Asal daerah harus diisi!";
+    } elseif (empty($status_konservasi)) {
+        $error_message = "Status konservasi harus dipilih!";
+    }
     
     // Handle image upload
     $image_name = $fauna['image']; // Keep existing image by default
     
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        // Get file info
+    if (empty($error_message) && isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $original_name = $_FILES['image']['name'];
         $tmp_name = $_FILES['image']['tmp_name'];
         $file_size = $_FILES['image']['size'];
         
-        // Get file extension
         $file_extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         
-        // Get MIME type for additional validation
-        $allowed_mime_types = [
-            'image/jpeg',
-            'image/jpg', 
-            'image/png',
-            'image/gif',
-            'image/webp'
-        ];
-        
-        $file_mime_type = '';
-        if (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $file_mime_type = finfo_file($finfo, $tmp_name);
-            finfo_close($finfo);
-        } else {
-            $file_mime_type = $_FILES['image']['type'];
-        }
-        
-        // Validate extension
         if (!in_array($file_extension, $allowed_extensions)) {
-            $error_message = "Format gambar tidak didukung! File: '$original_name' dengan ekstensi '$file_extension'. Gunakan JPG, JPEG, PNG, GIF, atau WebP.";
-        }
-        // Validate MIME type
-        elseif (!in_array($file_mime_type, $allowed_mime_types)) {
-            $error_message = "Tipe file tidak valid! MIME type: '$file_mime_type'. Pastikan file adalah gambar yang valid.";
-        }
-        // Validate file size
-        elseif ($file_size > 5 * 1024 * 1024) {
-            $error_message = "Ukuran gambar terlalu besar! Ukuran: " . number_format($file_size / 1024 / 1024, 2) . "MB. Maksimal 5MB.";
-        }
-        // All validations passed, try upload
-        else {
+            $error_message = "Format gambar tidak didukung! Gunakan JPG, JPEG, PNG, GIF, atau WebP.";
+        } elseif ($file_size > 5 * 1024 * 1024) {
+            $error_message = "Ukuran gambar terlalu besar! Maksimal 5MB.";
+        } else {
             $new_image_name = 'fauna_' . time() . '_' . uniqid() . '.' . $file_extension;
             $upload_path = '../assets/images/' . $new_image_name;
             
-            // Create directory if it doesn't exist
             if (!is_dir('../assets/images/')) {
                 mkdir('../assets/images/', 0755, true);
             }
@@ -106,10 +91,9 @@ if ($_POST) {
                     unlink('../' . $fauna['image']);
                 }
                 
-                // Update image name with relative path
                 $image_name = 'assets/images/' . $new_image_name;
             } else {
-                $error_message = "Gagal mengupload gambar! Periksa permission direktori. Upload path: " . $upload_path . " | Temp file: " . $tmp_name . " | Directory writable: " . (is_writable('../assets/images/') ? 'Yes' : 'No');
+                $error_message = "Gagal mengupload gambar!";
             }
         }
     }
@@ -127,26 +111,30 @@ if ($_POST) {
             makanan = ?,
             perilaku = ?,
             ciri_fisik = ?,
-            image = ?,
-            updated_at = NOW()
+            image = ?
             WHERE id = ?";
         
         $stmt = mysqli_prepare($conn, $update_query);
-        mysqli_stmt_bind_param($stmt, 'sssssssssssi', 
-            $nama, $nama_ilmiah, $deskripsi, $habitat, $habitat_detail, 
-            $asal_daerah, $status_konservasi, $makanan, $perilaku, 
-            $ciri_fisik, $image_name, $fauna_id);
-        
-        if (mysqli_stmt_execute($stmt)) {
-            $success_message = "Data fauna berhasil diperbarui!";
-            // Refresh data
-            $result = mysqli_query($conn, "SELECT * FROM fauna WHERE id = $fauna_id");
-            $fauna = mysqli_fetch_assoc($result);
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, 'sssssssssssi', 
+                $nama, $nama_ilmiah, $deskripsi, $habitat, $habitat_detail, 
+                $asal_daerah, $status_konservasi, $makanan, $perilaku, 
+                $ciri_fisik, $image_name, $fauna_id);
+            
+            if (mysqli_stmt_execute($stmt)) {
+                $success_message = "Data fauna berhasil diperbarui!";
+                
+                // Refresh data from database
+                $result = mysqli_query($conn, "SELECT * FROM fauna WHERE id = $fauna_id");
+                $fauna = mysqli_fetch_assoc($result);
+            } else {
+                $error_message = "Gagal memperbarui data fauna: " . mysqli_error($conn);
+            }
+            
+            mysqli_stmt_close($stmt);
         } else {
-            $error_message = "Gagal memperbarui data fauna: " . mysqli_error($conn);
+            $error_message = "Gagal menyiapkan query: " . mysqli_error($conn);
         }
-        
-        mysqli_stmt_close($stmt);
     }
 }
 ?>
@@ -156,6 +144,9 @@ if ($_POST) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Edit Fauna - EduFlora Admin</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/admin-fix.css">
@@ -272,7 +263,7 @@ if ($_POST) {
                                         Deskripsi <span class="required">*</span>
                                     </label>
                                     <textarea id="deskripsi" name="deskripsi" rows="4" required><?php echo htmlspecialchars($fauna['deskripsi']); ?></textarea>
-                                    <div class="form-help">Deskripsi lengkap tentang fauna (minimal 100 karakter)</div>
+                                    <div class="form-help">Deskripsi lengkap tentang fauna</div>
                                 </div>
                             </div>
                         </div>
@@ -299,6 +290,7 @@ if ($_POST) {
                                         <option value="Rawa" <?php echo $fauna['habitat'] == 'Rawa' ? 'selected' : ''; ?>>Rawa</option>
                                         <option value="Laut" <?php echo $fauna['habitat'] == 'Laut' ? 'selected' : ''; ?>>Laut</option>
                                         <option value="Sungai" <?php echo $fauna['habitat'] == 'Sungai' ? 'selected' : ''; ?>>Sungai</option>
+                                        <option value="Tanah" <?php echo $fauna['habitat'] == 'Tanah' ? 'selected' : ''; ?>>Tanah</option>
                                         <option value="Lainnya" <?php echo $fauna['habitat'] == 'Lainnya' ? 'selected' : ''; ?>>Lainnya</option>
                                     </select>
                                     <div class="form-help">Jenis habitat tempat fauna hidup</div>
@@ -395,21 +387,8 @@ if ($_POST) {
                                         <i class="fas fa-upload"></i>
                                         Upload Gambar Baru
                                     </label>
-                                    <div class="file-upload-area">
-                                        <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(this)">
-                                        <div class="file-upload-content">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                            <p>Klik untuk memilih gambar baru atau drag & drop</p>
-                                            <small>Format: JPG, PNG, GIF, WebP (Max: 5MB)</small>
-                                        </div>
-                                        <div id="imagePreview" class="image-preview" style="display: none;">
-                                            <img id="previewImg" src="" alt="Preview">
-                                            <button type="button" onclick="removeImage()" class="remove-image">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-help">Kosongkan jika tidak ingin mengubah gambar</div>
+                                    <input type="file" id="image" name="image" accept="image/*">
+                                    <div class="form-help">Format: JPG, PNG, GIF, WebP (Max: 5MB). Kosongkan jika tidak ingin mengubah gambar</div>
                                 </div>
                             </div>
                         </div>
@@ -420,14 +399,6 @@ if ($_POST) {
                                 <i class="fas fa-arrow-left"></i>
                                 Kembali
                             </a>
-                            <button type="button" onclick="confirmDelete()" class="btn btn-danger">
-                                <i class="fas fa-trash"></i>
-                                Hapus Fauna
-                            </button>
-                            <button type="button" onclick="resetForm()" class="btn btn-outline">
-                                <i class="fas fa-undo"></i>
-                                Reset
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i>
                                 Update Fauna
@@ -439,219 +410,13 @@ if ($_POST) {
         </main>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h3>
-                <span class="close">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus fauna <strong><?php echo htmlspecialchars($fauna['nama']); ?></strong>?</p>
-                <p class="warning-text">Tindakan ini tidak dapat dibatalkan!</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeDeleteModal()">
-                    <i class="fas fa-times"></i> Batal
-                </button>
-                <a href="fauna.php?delete=<?php echo $fauna['id']; ?>" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Hapus
-                </a>
-            </div>
-        </div>
-    </div>
-
     <script src="../assets/js/admin.js"></script>
     <script>
-        // Wait for DOM to be ready
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize form functionality after DOM is loaded
-            initializeForm();
-        });
-
-        function initializeForm() {
-            // Character counter for textarea
-            const deskripsiField = document.getElementById('deskripsi');
-            if (deskripsiField) {
-                deskripsiField.addEventListener('input', function() {
-                    const length = this.value.length;
-                    const help = this.nextElementSibling;
-                    if (help) {
-                        help.textContent = `Deskripsi lengkap tentang fauna (${length}/100 karakter minimum)`;
-                        
-                        if (length >= 100) {
-                            help.style.color = '#27ae60';
-                        } else {
-                            help.style.color = '#e74c3c';
-                        }
-                    }
-                });
-            }
-
-            // Check for unsaved changes
-            let formChanged = false;
-            document.querySelectorAll('input, textarea, select').forEach(element => {
-                element.addEventListener('change', () => formChanged = true);
-            });
-
-            window.addEventListener('beforeunload', function(e) {
-                if (formChanged) {
-                    e.preventDefault();
-                    e.returnValue = '';
-                }
-            });
-
-            // Mark form as saved when submitted
-            const form = document.querySelector('.fauna-form');
-            if (form) {
-                form.addEventListener('submit', () => formChanged = false);
-            }
-        }
-        // Image preview functionality
-        function previewImage(input) {
-            const preview = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('previewImg');
-            
-            // Check if elements exist
-            if (!preview || !previewImg) {
-                console.error('Preview elements not found');
-                return;
-            }
-            
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    preview.style.display = 'block';
-                    const uploadContent = input.parentElement.querySelector('.file-upload-content');
-                    if (uploadContent) {
-                        uploadContent.style.display = 'none';
-                    }
-                }
-                
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function removeImage() {
-            const input = document.getElementById('image');
-            const preview = document.getElementById('imagePreview');
-            const uploadContent = document.querySelector('.file-upload-content');
-            
-            if (input) input.value = '';
-            if (preview) preview.style.display = 'none';
-            if (uploadContent) uploadContent.style.display = 'block';
-        }
-
-        // Delete confirmation
-        function confirmDelete() {
-            document.getElementById('deleteModal').style.display = 'block';
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-
-        // Form reset functionality
-        function resetForm() {
-            if (confirm('Apakah Anda yakin ingin mereset form? Semua perubahan akan hilang.')) {
-                // Store original form data
-                const originalData = {
-                    nama: '<?php echo addslashes($fauna['nama']); ?>',
-                    nama_ilmiah: '<?php echo addslashes($fauna['nama_ilmiah']); ?>',
-                    deskripsi: '<?php echo addslashes($fauna['deskripsi']); ?>',
-                    habitat: '<?php echo addslashes($fauna['habitat']); ?>',
-                    habitat_detail: '<?php echo addslashes($fauna['habitat_detail']); ?>',
-                    asal_daerah: '<?php echo addslashes($fauna['asal_daerah']); ?>',
-                    status_konservasi: '<?php echo addslashes($fauna['status_konservasi']); ?>',
-                    makanan: '<?php echo addslashes($fauna['makanan']); ?>',
-                    perilaku: '<?php echo addslashes($fauna['perilaku']); ?>',
-                    ciri_fisik: '<?php echo addslashes($fauna['ciri_fisik']); ?>'
-                };
-                
-                // Reset form to original values
-                Object.keys(originalData).forEach(key => {
-                    const element = document.getElementById(key);
-                    if (element) {
-                        element.value = originalData[key];
-                    }
-                });
-                
-                // Reset image upload
-                removeImage();
-                formChanged = false;
-            }
-        }
-
-        // Form validation
-        document.querySelector('.fauna-form').addEventListener('submit', function(e) {
-            const deskripsi = document.getElementById('deskripsi').value;
-            
-            if (deskripsi.length < 100) {
-                e.preventDefault();
-                alert('Deskripsi harus minimal 100 karakter!');
-                document.getElementById('deskripsi').focus();
-                return false;
-            }
-            
-            // Mark form as saved when submitted
-            formChanged = false;
-        });
-
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            });
-        }, 5000);
-
-        // Character counter for textarea
-        const deskripsiField = document.getElementById('deskripsi');
-        if (deskripsiField) {
-            deskripsiField.addEventListener('input', function() {
-                const length = this.value.length;
-                const help = this.nextElementSibling;
-                if (help) {
-                    help.textContent = `Deskripsi lengkap tentang fauna (${length}/100 karakter minimum)`;
-                    help.style.color = length >= 100 ? '#27ae60' : '#e74c3c';
-                }
-            });
-        }
-
-        // Check for unsaved changes
-        let formChanged = false;
-        document.querySelectorAll('input, textarea, select').forEach(element => {
-            element.addEventListener('change', () => formChanged = true);
-        });
-
-        window.addEventListener('beforeunload', function(e) {
-            if (formChanged) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
-        });
-
-        // Close modal functionality
-        document.querySelectorAll('.close').forEach(closeBtn => {
-            closeBtn.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
-            });
-        });
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Alert close functionality
+        // Simple alert close functionality
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('alert-close')) {
                 const alert = e.target.closest('.alert');
                 alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-20px)';
                 setTimeout(() => alert.remove(), 300);
             }
         });
@@ -662,12 +427,13 @@ if ($_POST) {
             sidebar.classList.toggle('active');
         }
 
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                document.getElementById('adminSidebar').classList.remove('active');
-            }
-        });
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
     </script>
 </body>
 </html>

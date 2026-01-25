@@ -945,12 +945,12 @@ body {
     position: absolute;
     left: 1rem;
     color: #666;
-    z-index: 1;
+    z-index: 2;
 }
 
 .search-input-group input {
     width: 100%;
-    padding: 1rem 1rem 1rem 3rem;
+    padding: 1rem 8rem 1rem 3rem;
     border: 2px solid #e0e0e0;
     border-radius: var(--border-radius);
     font-size: 1rem;
@@ -961,6 +961,40 @@ body {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+/* Reset button inside search input group */
+.search-input-group .reset-btn-flora,
+.search-input-group .reset-btn-fauna {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0.5rem 1rem;
+    border-radius: calc(var(--border-radius) - 2px);
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.search-input-group .reset-btn-flora {
+    background: var(--gradient-primary);
+    color: var(--white);
+}
+
+.search-input-group .reset-btn-fauna {
+    background: var(--gradient-secondary);
+    color: var(--white);
+}
+
+.search-input-group .reset-btn-flora:hover,
+.search-input-group .reset-btn-fauna:hover {
+    transform: translateY(-50%) translateY(-1px);
+    box-shadow: var(--shadow-small);
 }
 
 .search-form select {
