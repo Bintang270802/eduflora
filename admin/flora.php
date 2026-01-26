@@ -88,6 +88,13 @@ $result = mysqli_query($conn, $query);
         .btn-edit:hover { background: #2563eb !important; color: white !important; text-decoration: none !important; }
         .btn-delete:hover { background: #dc2626 !important; color: white !important; text-decoration: none !important; }
         td:last-child { text-align: center !important; width: 120px !important; padding: 8px 4px !important; }
+        
+        /* Kolom habitat khusus */
+        td:nth-child(5), th:nth-child(5) { 
+            min-width: 140px !important; 
+            width: 140px !important; 
+            white-space: nowrap !important; 
+        }
     </style>
 </head>
 <body>
