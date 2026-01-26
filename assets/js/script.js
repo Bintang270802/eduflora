@@ -203,15 +203,180 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Parallax effect for hero section
+// Enhanced Parallax effect for hero section
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const parallax = document.querySelector('.hero-bg-animation');
     if (parallax) {
-        const speed = scrolled * 0.5;
+        const speed = scrolled * 0.3;
         parallax.style.transform = `translateY(${speed}px)`;
     }
+    
+    // Parallax for floating cards
+    const floatingCards = document.querySelectorAll('.floating-card');
+    floatingCards.forEach((card, index) => {
+        const speed = scrolled * (0.1 + index * 0.05);
+        card.style.transform = `translateY(${speed}px)`;
+    });
+    
+    // Parallax for decoration elements
+    const decorations = document.querySelectorAll('.decoration-element, .decoration-particle');
+    decorations.forEach((decoration, index) => {
+        const speed = scrolled * (0.05 + index * 0.02);
+        decoration.style.transform = `translateY(${speed}px)`;
+    });
 });
+
+// Add dynamic color changing for floating elements
+function addDynamicColors() {
+    const floatingElements = document.querySelectorAll('.floating-element');
+    const colors = [
+        'rgba(46, 139, 87, 0.15)',
+        'rgba(255, 107, 53, 0.15)',
+        'rgba(78, 205, 196, 0.15)',
+        'rgba(240, 147, 251, 0.15)',
+        'rgba(102, 126, 234, 0.15)',
+        'rgba(245, 101, 101, 0.15)'
+    ];
+    
+    floatingElements.forEach((element, index) => {
+        setInterval(() => {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            element.style.color = randomColor;
+        }, 3000 + index * 500);
+    });
+}
+
+// Add hover effects to stat cards
+function enhanceStatCards() {
+    const statCards = document.querySelectorAll('.stat-card');
+    
+    statCards.forEach((card, index) => {
+        card.addEventListener('mouseenter', () => {
+            // Add ripple effect
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.top = '50%';
+            ripple.style.left = '50%';
+            ripple.style.width = '0';
+            ripple.style.height = '0';
+            ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+            ripple.style.borderRadius = '50%';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.animation = 'ripple 0.6s ease-out';
+            ripple.style.pointerEvents = 'none';
+            
+            card.style.position = 'relative';
+            card.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// Add floating animation to feature items
+function enhanceFeatureItems() {
+    const featureItems = document.querySelectorAll('.feature-item');
+    
+    featureItems.forEach((item, index) => {
+        item.addEventListener('mouseenter', () => {
+            item.style.animation = `featureFloat 0.6s ease-out`;
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            item.style.animation = '';
+        });
+    });
+}
+
+// Add dynamic background particles
+function createBackgroundParticles() {
+    const sections = document.querySelectorAll('.flora-section, .fauna-section');
+    
+    sections.forEach(section => {
+        for (let i = 0; i < 5; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 4 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(46, 139, 87, 0.1)';
+            particle.style.borderRadius = '50%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animation = `particleFloat ${Math.random() * 10 + 5}s ease-in-out infinite`;
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '1';
+            
+            section.style.position = 'relative';
+            section.appendChild(particle);
+        }
+    });
+}
+
+// Initialize all enhancements
+document.addEventListener('DOMContentLoaded', () => {
+    addDynamicColors();
+    enhanceStatCards();
+    enhanceFeatureItems();
+    createBackgroundParticles();
+});
+
+// Add CSS animations dynamically
+const additionalStyles = `
+    @keyframes ripple {
+        0% {
+            width: 0;
+            height: 0;
+            opacity: 1;
+        }
+        100% {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+    }
+    
+    @keyframes featureFloat {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-10px) scale(1.05); }
+    }
+    
+    @keyframes particleFloat {
+        0%, 100% { 
+            transform: translateY(0) translateX(0) rotate(0deg);
+            opacity: 0.1;
+        }
+        25% { 
+            transform: translateY(-20px) translateX(10px) rotate(90deg);
+            opacity: 0.3;
+        }
+        50% { 
+            transform: translateY(-10px) translateX(-5px) rotate(180deg);
+            opacity: 0.2;
+        }
+        75% { 
+            transform: translateY(-30px) translateX(-10px) rotate(270deg);
+            opacity: 0.4;
+        }
+    }
+    
+    .floating-card:hover {
+        animation-play-state: paused;
+    }
+    
+    .orbit-element:hover {
+        animation-play-state: paused;
+        transform: scale(1.2) !important;
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = additionalStyles;
+document.head.appendChild(styleSheet);
 
 // Add loading animation to buttons
 document.querySelectorAll('.btn').forEach(btn => {

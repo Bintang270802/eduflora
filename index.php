@@ -73,12 +73,23 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                     <i class="fas fa-dove"></i>
                     <span>800+ Spesies Fauna</span>
                 </div>
+                <div class="floating-card">
+                    <i class="fas fa-tree"></i>
+                    <span>Habitat Beragam</span>
+                </div>
+                <div class="floating-card">
+                    <i class="fas fa-globe-asia"></i>
+                    <span>Seluruh Nusantara</span>
+                </div>
             </div>
         </div>
         <div class="hero-bg-animation">
             <div class="floating-element"><i class="fas fa-leaf"></i></div>
             <div class="floating-element"><i class="fas fa-butterfly"></i></div>
             <div class="floating-element"><i class="fas fa-seedling"></i></div>
+            <div class="floating-element"><i class="fas fa-feather"></i></div>
+            <div class="floating-element"><i class="fas fa-flower"></i></div>
+            <div class="floating-element"><i class="fas fa-bug"></i></div>
         </div>
     </section>
 
@@ -113,6 +124,22 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                     </div>
                     <div class="stat-number" data-target="34">0</div>
                     <div class="stat-label">Provinsi</div>
+                </div>
+            </div>
+            
+            <!-- Additional Visual Elements -->
+            <div class="stats-decorations">
+                <div class="decoration-element" style="position: absolute; top: 10%; left: 5%; color: rgba(46,139,87,0.1); font-size: 4rem; animation: float 6s ease-in-out infinite;">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="decoration-element" style="position: absolute; top: 20%; right: 8%; color: rgba(255,107,53,0.1); font-size: 3rem; animation: float 8s ease-in-out infinite 2s;">
+                    <i class="fas fa-butterfly"></i>
+                </div>
+                <div class="decoration-element" style="position: absolute; bottom: 15%; left: 10%; color: rgba(78,205,196,0.1); font-size: 3.5rem; animation: float 7s ease-in-out infinite 1s;">
+                    <i class="fas fa-tree"></i>
+                </div>
+                <div class="decoration-element" style="position: absolute; bottom: 25%; right: 12%; color: rgba(240,147,251,0.1); font-size: 2.5rem; animation: float 9s ease-in-out infinite 3s;">
+                    <i class="fas fa-dove"></i>
                 </div>
             </div>
         </div>
@@ -261,8 +288,38 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                     <div class="image-placeholder">
                         <i class="fas fa-globe-asia"></i>
                         <p>Indonesia Biodiversity</p>
+                        
+                        <!-- Floating Elements Around Globe -->
+                        <div class="orbit-element orbit-1">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="orbit-element orbit-2">
+                            <i class="fas fa-butterfly"></i>
+                        </div>
+                        <div class="orbit-element orbit-3">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="orbit-element orbit-4">
+                            <i class="fas fa-dove"></i>
+                        </div>
+                        <div class="orbit-element orbit-5">
+                            <i class="fas fa-flower"></i>
+                        </div>
+                        <div class="orbit-element orbit-6">
+                            <i class="fas fa-fish"></i>
+                        </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- Background Decorations -->
+            <div class="about-decorations">
+                <div class="decoration-particle" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+                <div class="decoration-particle" style="top: 20%; right: 8%; animation-delay: 2s;"></div>
+                <div class="decoration-particle" style="bottom: 15%; left: 10%; animation-delay: 4s;"></div>
+                <div class="decoration-particle" style="bottom: 25%; right: 12%; animation-delay: 1s;"></div>
+                <div class="decoration-particle" style="top: 60%; left: 15%; animation-delay: 3s;"></div>
+                <div class="decoration-particle" style="top: 70%; right: 20%; animation-delay: 5s;"></div>
             </div>
         </div>
     </section>

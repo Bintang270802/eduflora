@@ -93,6 +93,34 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fa
                 </div>
             </div>
         </div>
+        
+        <!-- Floating Decorations -->
+        <div class="hero-decorations">
+            <div class="hero-float-element" style="top: 15%; left: 10%; animation-delay: 0s;">
+                <i class="fas fa-paw"></i>
+            </div>
+            <div class="hero-float-element" style="top: 25%; right: 15%; animation-delay: 2s;">
+                <i class="fas fa-dove"></i>
+            </div>
+            <div class="hero-float-element" style="bottom: 20%; left: 20%; animation-delay: 1s;">
+                <i class="fas fa-fish"></i>
+            </div>
+            <div class="hero-float-element" style="bottom: 30%; right: 10%; animation-delay: 3s;">
+                <i class="fas fa-butterfly"></i>
+            </div>
+            <div class="hero-float-element" style="top: 60%; left: 5%; animation-delay: 4s;">
+                <i class="fas fa-spider"></i>
+            </div>
+            <div class="hero-float-element" style="top: 70%; right: 25%; animation-delay: 1.5s;">
+                <i class="fas fa-frog"></i>
+            </div>
+            <div class="hero-float-element" style="top: 40%; left: 30%; animation-delay: 2.5s;">
+                <i class="fas fa-dragon"></i>
+            </div>
+            <div class="hero-float-element" style="bottom: 50%; right: 30%; animation-delay: 3.5s;">
+                <i class="fas fa-hippo"></i>
+            </div>
+        </div>
     </section>
 
     <!-- Search and Filter Section -->
