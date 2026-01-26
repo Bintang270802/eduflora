@@ -18,9 +18,21 @@ $result_fauna = mysqli_query($conn, $query_fauna);
     <title>EduFlora - Sistem Informasi Edukasi Flora dan Fauna</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Animated Background Shapes -->
+    <div class="animated-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="floating-action" onclick="scrollToTop()" title="Kembali ke Atas">
+        <i class="fas fa-arrow-up"></i>
+    </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">

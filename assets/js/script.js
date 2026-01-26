@@ -503,3 +503,258 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// Scroll to top function
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Show/hide floating action button based on scroll
+window.addEventListener('scroll', () => {
+    const floatingAction = document.querySelector('.floating-action');
+    if (floatingAction) {
+        if (window.scrollY > 300) {
+            floatingAction.style.opacity = '1';
+            floatingAction.style.visibility = 'visible';
+        } else {
+            floatingAction.style.opacity = '0';
+            floatingAction.style.visibility = 'hidden';
+        }
+    }
+});
+
+// Create dynamic particles
+function createParticles() {
+    const particleContainer = document.createElement('div');
+    particleContainer.className = 'particle-container';
+    document.body.appendChild(particleContainer);
+    
+    setInterval(() => {
+        if (document.querySelectorAll('.particle').length < 20) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            particleContainer.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 8000);
+        }
+    }, 500);
+}
+
+// Enhanced card animations with stagger effect
+function enhanceCardAnimations() {
+    const cards = document.querySelectorAll('.flora-card, .fauna-card');
+    
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.classList.add('grid-item-enter');
+                    entry.target.style.opacity = '1';
+                }, index * 100);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    cards.forEach(card => {
+        card.style.opacity = '0';
+        cardObserver.observe(card);
+    });
+}
+
+// Add shimmer effect to titles
+function addShimmerEffect() {
+    const titles = document.querySelectorAll('.section-title, .page-title');
+    titles.forEach(title => {
+        title.classList.add('text-shimmer');
+    });
+}
+
+// Enhanced button interactions
+function enhanceButtons() {
+    const buttons = document.querySelectorAll('.btn, .search-btn, .reset-btn-flora, .reset-btn-fauna');
+    
+    buttons.forEach(button => {
+        button.classList.add('btn-enhanced');
+        
+        button.addEventListener('click', function(e) {
+            // Create ripple effect
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.classList.add('ripple-effect');
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// Add glow effect to important elements
+function addGlowEffects() {
+    const importantElements = document.querySelectorAll('.stat-card, .feature-item');
+    importantElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.classList.add('glow-pulse');
+        }, index * 200);
+    });
+}
+
+// Dynamic color changing for floating elements
+function addDynamicColorChanging() {
+    const floatingElements = document.querySelectorAll('.floating-element, .hero-float-element');
+    const colors = [
+        'rgba(46, 139, 87, 0.2)',
+        'rgba(255, 107, 53, 0.2)',
+        'rgba(78, 205, 196, 0.2)',
+        'rgba(240, 147, 251, 0.2)',
+        'rgba(102, 126, 234, 0.2)',
+        'rgba(245, 101, 101, 0.2)'
+    ];
+    
+    floatingElements.forEach((element, index) => {
+        setInterval(() => {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            element.style.color = randomColor;
+        }, 2000 + index * 300);
+    });
+}
+
+// Mouse trail effect
+function createMouseTrail() {
+    let mouseTrail = [];
+    const maxTrailLength = 10;
+    
+    document.addEventListener('mousemove', (e) => {
+        mouseTrail.push({ x: e.clientX, y: e.clientY, time: Date.now() });
+        
+        if (mouseTrail.length > maxTrailLength) {
+            mouseTrail.shift();
+        }
+        
+        // Remove old trail elements
+        document.querySelectorAll('.mouse-trail').forEach(trail => {
+            if (Date.now() - parseInt(trail.dataset.time) > 1000) {
+                trail.remove();
+            }
+        });
+        
+        // Create new trail element
+        const trailElement = document.createElement('div');
+        trailElement.className = 'mouse-trail';
+        trailElement.dataset.time = Date.now();
+        trailElement.style.cssText = `
+            position: fixed;
+            left: ${e.clientX}px;
+            top: ${e.clientY}px;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.6;
+            animation: trailFade 1s ease-out forwards;
+        `;
+        document.body.appendChild(trailElement);
+    });
+}
+
+// Initialize all enhancements
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize existing functions
+    addDynamicColors();
+    enhanceStatCards();
+    enhanceFeatureItems();
+    createBackgroundParticles();
+    
+    // Initialize new functions
+    createParticles();
+    enhanceCardAnimations();
+    addShimmerEffect();
+    enhanceButtons();
+    addGlowEffects();
+    addDynamicColorChanging();
+    createMouseTrail();
+    
+    // Set initial state for floating action button
+    const floatingAction = document.querySelector('.floating-action');
+    if (floatingAction) {
+        floatingAction.style.opacity = '0';
+        floatingAction.style.visibility = 'hidden';
+        floatingAction.style.transition = 'all 0.3s ease';
+    }
+});
+
+// Add additional CSS for new effects
+const newStyles = `
+    @keyframes trailFade {
+        0% {
+            opacity: 0.6;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+    }
+    
+    .ripple-effect {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: rippleAnimation 0.6s linear;
+        pointer-events: none;
+    }
+    
+    @keyframes rippleAnimation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+    
+    .mouse-trail {
+        transition: all 0.1s ease;
+    }
+    
+    @media (max-width: 768px) {
+        .mouse-trail {
+            display: none;
+        }
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+        .mouse-trail,
+        .particle,
+        .ripple-effect {
+            display: none !important;
+        }
+    }
+`;
+
+const additionalStyleSheet = document.createElement('style');
+additionalStyleSheet.textContent = newStyles;
+document.head.appendChild(additionalStyleSheet);
