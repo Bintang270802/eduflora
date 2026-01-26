@@ -27,19 +27,17 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Navbar scroll effect
+// Navbar scroll effect with class-based approach
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
     if (window.scrollY > 100) {
-        navbar.style.background = 'rgba(255, 255, 255, 0.98)';
-        navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+        navbar.classList.add('scrolled');
     } else {
-        navbar.style.background = 'rgba(255, 255, 255, 0.95)';
-        navbar.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+        navbar.classList.remove('scrolled');
     }
 });
 
-// Counter animation for stats
+// Enhanced counter animation for stats
 function animateCounter(element, target) {
     let current = 0;
     const increment = target / 100;
@@ -49,11 +47,11 @@ function animateCounter(element, target) {
             current = target;
             clearInterval(timer);
         }
-        element.textContent = Math.floor(current).toLocaleString();
+        element.textContent = Math.floor(current).toLocaleString('id-ID');
     }, 20);
 }
 
-// Intersection Observer for animations
+// Enhanced Intersection Observer for animations
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -69,12 +67,29 @@ const observer = new IntersectionObserver((entries) => {
                 observer.unobserve(entry.target);
             }
             
-            // Fade in animation
+            // Staggered card animations
             if (entry.target.classList.contains('flora-card') || 
                 entry.target.classList.contains('fauna-card')) {
+                const cards = document.querySelectorAll('.flora-card, .fauna-card');
+                const index = Array.from(cards).indexOf(entry.target);
+                
                 entry.target.style.opacity = '0';
                 entry.target.style.transform = 'translateY(30px)';
                 entry.target.style.transition = 'all 0.6s ease-out';
+                
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100); // Stagger animation
+                
+                observer.unobserve(entry.target);
+            }
+            
+            // Section animations
+            if (entry.target.classList.contains('section-header')) {
+                entry.target.style.opacity = '0';
+                entry.target.style.transform = 'translateY(30px)';
+                entry.target.style.transition = 'all 0.8s ease-out';
                 
                 setTimeout(() => {
                     entry.target.style.opacity = '1';
@@ -90,6 +105,7 @@ const observer = new IntersectionObserver((entries) => {
 // Observe elements
 document.querySelectorAll('.stat-number').forEach(el => observer.observe(el));
 document.querySelectorAll('.flora-card, .fauna-card').forEach(el => observer.observe(el));
+document.querySelectorAll('.section-header').forEach(el => observer.observe(el));
 
 // Modal functionality
 const modal = document.getElementById('detailModal');
