@@ -48,21 +48,9 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fl
     <title>Flora Indonesia - EduFlora</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Animated Background Shapes -->
-    <div class="animated-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-        <div class="shape shape-4"></div>
-    </div>
-
-    <!-- Floating Action Button -->
-    <div class="floating-action" onclick="scrollToTop()" title="Kembali ke Atas">
-        <i class="fas fa-arrow-up"></i>
-    </div>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -103,28 +91,6 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fl
                         <span class="stat-label">Spesies Flora</span>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Floating Decorations -->
-        <div class="hero-decorations">
-            <div class="hero-float-element" style="top: 15%; left: 10%; animation-delay: 0s;">
-                <i class="fas fa-leaf"></i>
-            </div>
-            <div class="hero-float-element" style="top: 25%; right: 15%; animation-delay: 2s;">
-                <i class="fas fa-seedling"></i>
-            </div>
-            <div class="hero-float-element" style="bottom: 20%; left: 20%; animation-delay: 1s;">
-                <i class="fas fa-tree"></i>
-            </div>
-            <div class="hero-float-element" style="bottom: 30%; right: 10%; animation-delay: 3s;">
-                <i class="fas fa-flower"></i>
-            </div>
-            <div class="hero-float-element" style="top: 60%; left: 5%; animation-delay: 4s;">
-                <i class="fas fa-spa"></i>
-            </div>
-            <div class="hero-float-element" style="top: 70%; right: 25%; animation-delay: 1.5s;">
-                <i class="fas fa-cannabis"></i>
             </div>
         </div>
     </section>
