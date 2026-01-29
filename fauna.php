@@ -127,12 +127,10 @@ $status_options = mysqli_query($conn, "SELECT DISTINCT status_konservasi FROM fa
                         <i class="fas fa-search"></i>
                         Cari
                     </button>
-                    <?php if (!empty($search) || !empty($habitat_filter) || !empty($status_filter)): ?>
                     <a href="fauna.php" class="reset-btn-fauna">
                         <i class="fas fa-undo"></i>
                         Reset
                     </a>
-                    <?php endif; ?>
                 </div>
             </form>
         </div>

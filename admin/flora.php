@@ -174,12 +174,10 @@ $result = mysqli_query($conn, $query);
                                 </button>
                             </div>
                         </form>
-                        <?php if (!empty($search)): ?>
                         <a href="flora.php" class="btn-reset">
                             <i class="fas fa-undo"></i>
                             Reset
                         </a>
-                        <?php endif; ?>
                     </div>
                     <div class="action-buttons">
                         <a href="flora_add.php" class="btn btn-primary">
