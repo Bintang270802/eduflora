@@ -8,6 +8,12 @@ $query_fauna = "SELECT * FROM fauna ORDER BY created_at DESC LIMIT 6";
 
 $result_flora = mysqli_query($conn, $query_flora);
 $result_fauna = mysqli_query($conn, $query_fauna);
+
+// Hitung statistik otomatis
+$flora_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM flora"))['total'];
+$fauna_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM fauna"))['total'];
+$total_species = $flora_count + $fauna_count;
+$protected_species = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM (SELECT id FROM flora WHERE status_konservasi IN ('Terancam', 'Langka', 'Kritis') UNION ALL SELECT id FROM fauna WHERE status_konservasi IN ('Terancam', 'Langka', 'Kritis')) as protected"))['total'];
 ?>
 
 <!DOCTYPE html>
@@ -67,12 +73,20 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                 </div>
                 <div class="hero-image">
                     <div class="floating-card">
-                        <i class="fas fa-leaf"></i>
-                        <span>1000+ Spesies Flora</span>
+                        <i class="fas fa-seedling"></i>
+                        <span><?php echo $flora_count; ?>+ Spesies Flora</span>
                     </div>
                     <div class="floating-card">
-                        <i class="fas fa-dove"></i>
-                        <span>800+ Spesies Fauna</span>
+                        <i class="fas fa-paw"></i>
+                        <span><?php echo $fauna_count; ?>+ Spesies Fauna</span>
+                    </div>
+                    <div class="floating-card">
+                        <i class="fas fa-tree"></i>
+                        <span>Habitat Beragam</span>
+                    </div>
+                    <div class="floating-card">
+                        <i class="fas fa-globe-asia"></i>
+                        <span>Seluruh Nusantara</span>
                     </div>
                 </div>
             </div>
@@ -87,29 +101,29 @@ $result_fauna = mysqli_query($conn, $query_fauna);
                     <div class="stat-icon">
                         <i class="fas fa-seedling"></i>
                     </div>
-                    <div class="stat-number" data-target="1000">0</div>
+                    <div class="stat-number" data-target="<?php echo $flora_count; ?>">0</div>
                     <div class="stat-label">Spesies Flora</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-paw"></i>
                     </div>
-                    <div class="stat-number" data-target="800">0</div>
+                    <div class="stat-number" data-target="<?php echo $fauna_count; ?>">0</div>
                     <div class="stat-label">Spesies Fauna</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    <div class="stat-number" data-target="50000">0</div>
-                    <div class="stat-label">Pengguna Aktif</div>
+                    <div class="stat-number" data-target="<?php echo $protected_species; ?>">0</div>
+                    <div class="stat-label">Spesies Dilindungi</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-globe-asia"></i>
                     </div>
-                    <div class="stat-number" data-target="34">0</div>
-                    <div class="stat-label">Provinsi</div>
+                    <div class="stat-number" data-target="<?php echo $total_species; ?>">0</div>
+                    <div class="stat-label">Total Spesies</div>
                 </div>
             </div>
         </div>

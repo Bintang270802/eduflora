@@ -365,6 +365,9 @@ body {
     flex: 1;
     min-width: 300px;
     max-width: 500px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .search-form {
@@ -415,6 +418,38 @@ body {
 
 .search-btn:hover {
     background: #267d4a;
+}
+
+/* Reset Button - Box Design */
+.btn-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #4ECDC4 0%, #2E8B57 100%);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: var(--transition-slow);
+    box-shadow: 0 3px 10px rgba(46, 139, 87, 0.25);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.btn-reset:hover {
+    background: linear-gradient(135deg, #3CB371 0%, #267d4a 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(46, 139, 87, 0.35);
+    color: var(--white);
+    text-decoration: none;
+}
+
+.btn-reset i {
+    font-size: 0.875rem;
 }
 
 .action-buttons {

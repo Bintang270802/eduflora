@@ -90,26 +90,6 @@ if (!$flora) {
 
             <!-- Content -->
             <div class="admin-content">
-                <!-- Quick Actions -->
-                <div class="quick-actions">
-                    <a href="flora.php" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i>
-                        Kembali ke Daftar
-                    </a>
-                    <a href="flora_edit.php?id=<?php echo $flora['id']; ?>" class="btn btn-primary">
-                        <i class="fas fa-edit"></i>
-                        Edit Flora
-                    </a>
-                    <a href="../get_detail.php?type=flora&id=<?php echo $flora['id']; ?>" target="_blank" class="btn btn-info">
-                        <i class="fas fa-external-link-alt"></i>
-                        Lihat di Website
-                    </a>
-                    <button onclick="printDetail()" class="btn btn-outline">
-                        <i class="fas fa-print"></i>
-                        Print
-                    </button>
-                </div>
-
                 <!-- Detail Container -->
                 <div class="detail-container">
                     <!-- Header Section -->
@@ -141,6 +121,21 @@ if (!$flora) {
                                     <i class="fas fa-map-marker-alt"></i>
                                     <?php echo $flora['asal_daerah']; ?>
                                 </span>
+                            </div>
+
+                            <div class="detail-actions">
+                                <a href="flora_edit.php?id=<?php echo $flora['id']; ?>" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                    Edit Flora
+                                </a>
+                                <button onclick="confirmDelete(<?php echo $flora['id']; ?>, '<?php echo addslashes($flora['nama']); ?>')" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                    Hapus Flora
+                                </button>
+                                <a href="flora.php" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Kembali
+                                </a>
                             </div>
 
                             <div class="detail-meta">
@@ -277,6 +272,28 @@ if (!$flora) {
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h3>
+                <span class="close-delete">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus flora <strong id="deleteItemName"></strong>?</p>
+                <p class="warning-text">Tindakan ini tidak dapat dibatalkan!</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+                <a id="confirmDeleteBtn" href="#" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Hapus
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
         // View full image
         function viewFullImage() {
@@ -292,16 +309,30 @@ if (!$flora) {
             document.getElementById('imageModal').style.display = 'none';
         });
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('imageModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
+        // Delete confirmation
+        function confirmDelete(id, name) {
+            document.getElementById('deleteItemName').textContent = name;
+            document.getElementById('confirmDeleteBtn').href = 'flora.php?delete=' + id;
+            document.getElementById('deleteModal').style.display = 'block';
         }
 
-        // Print functionality
-        function printDetail() {
-            window.print();
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close delete modal when clicking outside or close button
+        document.querySelector('.close-delete').addEventListener('click', closeDeleteModal);
+
+        window.onclick = function(event) {
+            const imageModal = document.getElementById('imageModal');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            if (event.target === imageModal) {
+                imageModal.style.display = 'none';
+            }
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
         }
 
         // Add smooth scrolling to sections
@@ -447,6 +478,19 @@ if (!$flora) {
             gap: 0.5rem;
         }
 
+        .detail-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .detail-actions .btn {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+
         .meta-item {
             display: flex;
             align-items: center;
@@ -590,14 +634,14 @@ if (!$flora) {
                 grid-template-columns: 1fr;
             }
 
-            .quick-actions {
-                flex-wrap: wrap;
+            .detail-actions {
+                flex-direction: column;
                 gap: 0.5rem;
             }
 
-            .quick-actions .btn {
-                flex: 1;
-                min-width: 120px;
+            .detail-actions .btn {
+                flex: none;
+                width: 100%;
             }
         }
 
@@ -605,7 +649,7 @@ if (!$flora) {
         @media print {
             .admin-sidebar,
             .admin-header,
-            .quick-actions {
+            .detail-actions {
                 display: none !important;
             }
 
@@ -622,6 +666,80 @@ if (!$flora) {
                 background: #f8f9fa !important;
                 color: var(--dark-color) !important;
             }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: #dc3545;
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .close-delete {
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .close-delete:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-body p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .warning-text {
+            color: #dc3545;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
         }
     </style>
 </body>

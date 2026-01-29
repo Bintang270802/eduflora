@@ -166,6 +166,10 @@ $result = mysqli_query($conn, $query);
                                 </button>
                             </div>
                         </form>
+                        <a href="fauna.php" class="btn-reset">
+                            <i class="fas fa-undo"></i>
+                            Reset
+                        </a>
                     </div>
                     <div class="action-buttons">
                         <a href="fauna_add.php" class="btn btn-primary">

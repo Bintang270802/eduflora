@@ -174,6 +174,10 @@ $result = mysqli_query($conn, $query);
                                 </button>
                             </div>
                         </form>
+                        <a href="flora.php" class="btn-reset">
+                            <i class="fas fa-undo"></i>
+                            Reset
+                        </a>
                     </div>
                     <div class="action-buttons">
                         <a href="flora_add.php" class="btn btn-primary">
