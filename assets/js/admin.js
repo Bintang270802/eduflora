@@ -856,3 +856,618 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// ===== ENHANCED MOBILE MENU FUNCTIONALITY =====
+class MobileMenuManager {
+    constructor() {
+        this.sidebar = document.getElementById('adminSidebar');
+        this.mobileToggle = document.querySelector('.mobile-menu-toggle');
+        this.overlay = null;
+        this.isOpen = false;
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.sidebar || !this.mobileToggle) return;
+        
+        // Create overlay
+        this.createOverlay();
+        
+        // Bind events
+        this.bindEvents();
+        
+        // Set initial ARIA attributes
+        this.setAriaAttributes();
+        
+        // Handle window resize
+        this.handleResize();
+    }
+    
+    createOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'sidebar-overlay';
+        document.body.appendChild(this.overlay);
+    }
+    
+    bindEvents() {
+        // Mobile toggle click
+        this.mobileToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggle();
+        });
+        
+        // Overlay click
+        this.overlay.addEventListener('click', () => {
+            this.close();
+        });
+        
+        // Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isOpen) {
+                this.close();
+            }
+        });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+        
+        // Sidebar links click (close menu on mobile)
+        const sidebarLinks = this.sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    this.close();
+                }
+            });
+        });
+    }
+    
+    setAriaAttributes() {
+        this.mobileToggle.setAttribute('aria-expanded', 'false');
+        this.mobileToggle.setAttribute('aria-controls', 'adminSidebar');
+        this.mobileToggle.setAttribute('aria-label', 'Toggle navigation menu');
+        this.sidebar.setAttribute('aria-hidden', 'true');
+    }
+    
+    toggle() {
+        if (this.isOpen) {
+            this.close();
+        } else {
+            this.open();
+        }
+    }
+    
+    open() {
+        this.isOpen = true;
+        this.sidebar.classList.add('active');
+        this.overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Update ARIA attributes
+        this.mobileToggle.setAttribute('aria-expanded', 'true');
+        this.sidebar.setAttribute('aria-hidden', 'false');
+        
+        // Focus first link for accessibility
+        const firstLink = this.sidebar.querySelector('a');
+        if (firstLink) {
+            setTimeout(() => firstLink.focus(), 100);
+        }
+    }
+    
+    close() {
+        this.isOpen = false;
+        this.sidebar.classList.remove('active');
+        this.overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        // Update ARIA attributes
+        this.mobileToggle.setAttribute('aria-expanded', 'false');
+        this.sidebar.setAttribute('aria-hidden', 'true');
+    }
+    
+    handleResize() {
+        if (window.innerWidth > 768) {
+            this.close();
+        }
+    }
+}
+
+// ===== ENHANCED TABLE RESPONSIVENESS =====
+class ResponsiveTableManager {
+    constructor() {
+        this.tables = document.querySelectorAll('table');
+        this.init();
+    }
+    
+    init() {
+        this.tables.forEach(table => {
+            this.makeTableResponsive(table);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+    }
+    
+    makeTableResponsive(table) {
+        const container = table.closest('.table-content');
+        if (!container) return;
+        
+        // Add scroll indicators
+        this.addScrollIndicators(container);
+        
+        // Handle scroll events
+        container.addEventListener('scroll', () => {
+            this.updateScrollIndicators(container);
+        });
+    }
+    
+    addScrollIndicators(container) {
+        // Left indicator
+        const leftIndicator = document.createElement('div');
+        leftIndicator.className = 'scroll-indicator scroll-indicator-left';
+        leftIndicator.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        
+        // Right indicator
+        const rightIndicator = document.createElement('div');
+        rightIndicator.className = 'scroll-indicator scroll-indicator-right';
+        rightIndicator.innerHTML = '<i class="fas fa-chevron-right"></i>';
+        
+        container.style.position = 'relative';
+        container.appendChild(leftIndicator);
+        container.appendChild(rightIndicator);
+        
+        // Initial state
+        this.updateScrollIndicators(container);
+    }
+    
+    updateScrollIndicators(container) {
+        const leftIndicator = container.querySelector('.scroll-indicator-left');
+        const rightIndicator = container.querySelector('.scroll-indicator-right');
+        
+        if (!leftIndicator || !rightIndicator) return;
+        
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        
+        // Show/hide left indicator
+        leftIndicator.style.opacity = scrollLeft > 0 ? '1' : '0';
+        
+        // Show/hide right indicator
+        rightIndicator.style.opacity = scrollLeft < scrollWidth - clientWidth ? '1' : '0';
+    }
+    
+    handleResize() {
+        this.tables.forEach(table => {
+            const container = table.closest('.table-content');
+            if (container) {
+                this.updateScrollIndicators(container);
+            }
+        });
+    }
+}
+
+// ===== ENHANCED FORM VALIDATION =====
+class FormValidationManager {
+    constructor() {
+        this.forms = document.querySelectorAll('form');
+        this.init();
+    }
+    
+    init() {
+        this.forms.forEach(form => {
+            this.enhanceForm(form);
+        });
+    }
+    
+    enhanceForm(form) {
+        const inputs = form.querySelectorAll('input, select, textarea');
+        
+        inputs.forEach(input => {
+            // Real-time validation
+            input.addEventListener('blur', () => this.validateField(input));
+            input.addEventListener('input', () => this.clearFieldError(input));
+            
+            // Touch-friendly improvements
+            if (input.type === 'file') {
+                this.enhanceFileInput(input);
+            }
+        });
+        
+        // Form submission
+        form.addEventListener('submit', (e) => {
+            if (!this.validateForm(form)) {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    validateField(field) {
+        const formGroup = field.closest('.form-group');
+        if (!formGroup) return true;
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Required validation
+        if (field.hasAttribute('required') && !field.value.trim()) {
+            isValid = false;
+            errorMessage = 'Field ini wajib diisi';
+        }
+        
+        // Email validation
+        if (field.type === 'email' && field.value && !this.isValidEmail(field.value)) {
+            isValid = false;
+            errorMessage = 'Format email tidak valid';
+        }
+        
+        // File validation
+        if (field.type === 'file' && field.files.length > 0) {
+            const file = field.files[0];
+            if (!this.isValidFile(file)) {
+                isValid = false;
+                errorMessage = 'File tidak valid';
+            }
+        }
+        
+        // Update UI
+        formGroup.classList.toggle('error', !isValid);
+        formGroup.classList.toggle('success', isValid && field.value.trim());
+        
+        if (!isValid) {
+            this.showFieldError(field, errorMessage);
+        } else {
+            this.clearFieldError(field);
+        }
+        
+        return isValid;
+    }
+    
+    validateForm(form) {
+        const fields = form.querySelectorAll('input[required], select[required], textarea[required]');
+        let isValid = true;
+        
+        fields.forEach(field => {
+            if (!this.validateField(field)) {
+                isValid = false;
+            }
+        });
+        
+        return isValid;
+    }
+    
+    showFieldError(field, message) {
+        this.clearFieldError(field);
+        
+        const errorElement = document.createElement('div');
+        errorElement.className = 'field-error';
+        errorElement.textContent = message;
+        errorElement.style.cssText = `
+            color: #ef4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: block;
+        `;
+        
+        field.parentNode.appendChild(errorElement);
+    }
+    
+    clearFieldError(field) {
+        const formGroup = field.closest('.form-group');
+        if (formGroup) {
+            formGroup.classList.remove('error');
+            const errorElement = formGroup.querySelector('.field-error');
+            if (errorElement) {
+                errorElement.remove();
+            }
+        }
+    }
+    
+    isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    isValidFile(file) {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        
+        return file.size <= maxSize && allowedTypes.includes(file.type);
+    }
+    
+    enhanceFileInput(input) {
+        const formGroup = input.closest('.form-group');
+        if (!formGroup) return;
+        
+        // Create drag and drop area
+        const dropArea = document.createElement('div');
+        dropArea.className = 'file-drop-area';
+        dropArea.innerHTML = `
+            <div class="file-drop-content">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop file atau klik untuk memilih</p>
+                <small>Maksimal 5MB, format: JPG, PNG, GIF, WebP</small>
+            </div>
+        `;
+        
+        // Style the drop area
+        dropArea.style.cssText = `
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        `;
+        
+        // Insert after input
+        input.style.display = 'none';
+        input.parentNode.insertBefore(dropArea, input.nextSibling);
+        
+        // Handle events
+        dropArea.addEventListener('click', () => input.click());
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#2e8b57';
+            dropArea.style.backgroundColor = 'rgba(46, 139, 87, 0.05)';
+        });
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.borderColor = '#d1d5db';
+            dropArea.style.backgroundColor = 'transparent';
+        });
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#d1d5db';
+            dropArea.style.backgroundColor = 'transparent';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                input.files = files;
+                this.showFilePreview(input, files[0]);
+            }
+        });
+        
+        // Handle file selection
+        input.addEventListener('change', () => {
+            if (input.files.length > 0) {
+                this.showFilePreview(input, input.files[0]);
+            }
+        });
+    }
+    
+    showFilePreview(input, file) {
+        const dropArea = input.parentNode.querySelector('.file-drop-area');
+        if (!dropArea) return;
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                dropArea.innerHTML = `
+                    <div class="file-preview">
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                        <p style="margin-top: 0.5rem; font-weight: 500;">${file.name}</p>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="this.closest('.file-drop-area').parentNode.querySelector('input[type=file]').value=''; this.closest('.file-drop-area').innerHTML=this.closest('.file-drop-area').dataset.original;">
+                            <i class="fas fa-times"></i> Hapus
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            dropArea.innerHTML = `
+                <div class="file-preview">
+                    <i class="fas fa-file" style="font-size: 3rem; color: #6b7280; margin-bottom: 1rem;"></i>
+                    <p style="font-weight: 500;">${file.name}</p>
+                    <p style="color: #6b7280; font-size: 0.875rem;">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="this.closest('.file-drop-area').parentNode.querySelector('input[type=file]').value=''; this.closest('.file-drop-area').innerHTML=this.closest('.file-drop-area').dataset.original;">
+                        <i class="fas fa-times"></i> Hapus
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// ===== ENHANCED LOADING STATES =====
+class LoadingStateManager {
+    constructor() {
+        this.init();
+    }
+    
+    init() {
+        // Auto-hide alerts
+        this.handleAlerts();
+        
+        // Button loading states
+        this.handleButtonLoading();
+        
+        // Form submission loading
+        this.handleFormLoading();
+    }
+    
+    handleAlerts() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            // Add close button
+            if (!alert.querySelector('.alert-close')) {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'alert-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.style.cssText = `
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-left: auto;
+                    color: inherit;
+                    opacity: 0.7;
+                    transition: opacity 0.2s ease;
+                `;
+                closeBtn.addEventListener('click', () => this.hideAlert(alert));
+                closeBtn.addEventListener('mouseenter', () => closeBtn.style.opacity = '1');
+                closeBtn.addEventListener('mouseleave', () => closeBtn.style.opacity = '0.7');
+                alert.appendChild(closeBtn);
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => this.hideAlert(alert), 5000);
+        });
+    }
+    
+    hideAlert(alert) {
+        alert.style.opacity = '0';
+        alert.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 300);
+    }
+    
+    handleButtonLoading() {
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (btn.type === 'submit' || btn.classList.contains('btn-primary')) {
+                btn.addEventListener('click', () => {
+                    if (!btn.classList.contains('btn-delete')) {
+                        this.setButtonLoading(btn, true);
+                        
+                        // Auto-remove loading after 3 seconds (fallback)
+                        setTimeout(() => {
+                            this.setButtonLoading(btn, false);
+                        }, 3000);
+                    }
+                });
+            }
+        });
+    }
+    
+    handleFormLoading() {
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', () => {
+                const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submitBtn) {
+                    this.setButtonLoading(submitBtn, true);
+                }
+            });
+        });
+    }
+    
+    setButtonLoading(btn, loading) {
+        if (loading) {
+            btn.classList.add('loading');
+            btn.disabled = true;
+            btn.dataset.originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        } else {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            if (btn.dataset.originalText) {
+                btn.innerHTML = btn.dataset.originalText;
+            }
+        }
+    }
+}
+
+// ===== INITIALIZE ALL MANAGERS =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize existing AdminPanel
+    if (typeof AdminPanel !== 'undefined') {
+        new AdminPanel();
+    }
+    
+    // Initialize new managers
+    new MobileMenuManager();
+    new ResponsiveTableManager();
+    new FormValidationManager();
+    new LoadingStateManager();
+});
+
+// ===== UTILITY FUNCTIONS =====
+function toggleSidebar() {
+    const sidebar = document.getElementById('adminSidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar && overlay) {
+        const isActive = sidebar.classList.contains('active');
+        
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+        
+        if (!isActive) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+}
+
+// Global function for delete confirmation
+function confirmDelete(id, name) {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        document.getElementById('deleteItemName').textContent = name;
+        document.getElementById('confirmDeleteBtn').href = '?delete=' + id;
+        modal.style.display = 'block';
+    }
+}
+
+function closeDeleteModal() {
+    const modal = document.getElementById('deleteModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
+// Add CSS for scroll indicators
+const scrollIndicatorStyles = `
+<style>
+.scroll-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: rgba(46, 139, 87, 0.9);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.scroll-indicator-left {
+    left: 10px;
+}
+
+.scroll-indicator-right {
+    right: 10px;
+}
+
+@media (max-width: 768px) {
+    .scroll-indicator {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+    }
+}
+</style>
+`;
+
+// Inject styles
+document.head.insertAdjacentHTML('beforeend', scrollIndicatorStyles);
