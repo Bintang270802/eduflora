@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once '../config/database.php';
 
 // Redirect jika sudah login
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -14,41 +13,17 @@ if ($_POST) {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
     
-    if (!empty($username) && !empty($password)) {
-        // Query untuk mencari user di database
-        $stmt = mysqli_prepare($conn, "SELECT id, username, password, full_name, role, is_active FROM admin_users WHERE username = ? AND is_active = 1");
-        mysqli_stmt_bind_param($stmt, "s", $username);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        
-        if ($user = mysqli_fetch_assoc($result)) {
-            // Verifikasi password
-            if (password_verify($password, $user['password'])) {
-                // Login berhasil
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_id'] = $user['id'];
-                $_SESSION['admin_username'] = $user['username'];
-                $_SESSION['admin_full_name'] = $user['full_name'];
-                $_SESSION['admin_role'] = $user['role'];
-                
-                // Update last login
-                $update_stmt = mysqli_prepare($conn, "UPDATE admin_users SET last_login = NOW() WHERE id = ?");
-                mysqli_stmt_bind_param($update_stmt, "i", $user['id']);
-                mysqli_stmt_execute($update_stmt);
-                mysqli_stmt_close($update_stmt);
-                
-                header('Location: flora.php');
-                exit();
-            } else {
-                $error_message = 'Username atau password salah!';
-            }
-        } else {
-            $error_message = 'Username atau password salah!';
-        }
-        
-        mysqli_stmt_close($stmt);
+    // Kredensial admin (hardcoded - simple)
+    $admin_username = 'admin';
+    $admin_password = 'admin123';
+    
+    if ($username === $admin_username && $password === $admin_password) {
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_username'] = $username;
+        header('Location: flora.php');
+        exit();
     } else {
-        $error_message = 'Harap isi semua field!';
+        $error_message = 'Username atau password salah!';
     }
 }
 ?>
@@ -135,13 +110,6 @@ if ($_POST) {
                         <a href="../index.php">
                             <i class="fas fa-arrow-left"></i>
                             Kembali ke Website
-                        </a>
-                    </div>
-                    
-                    <div class="admin-tools">
-                        <a href="create_admin.php" style="font-size: 12px; color: #666;">
-                            <i class="fas fa-user-plus"></i>
-                            Create New Admin
                         </a>
                     </div>
                 </div>
