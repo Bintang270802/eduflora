@@ -439,6 +439,8 @@ html {
         padding: 0.75rem;
     }
 }
+
+.sidebar-header {
     padding: 1.5rem;
     border-bottom: 1px solid var(--gray-200);
     background: var(--white);
