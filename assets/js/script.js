@@ -1,20 +1,88 @@
-// ===== MOBILE NAVIGATION =====
+// ===== ENHANCED MOBILE NAVIGATION =====
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
+const navLinks = document.querySelectorAll('.nav-link');
+const body = document.body;
 
+// Mobile menu toggle with improved accessibility
 if (hamburger && navMenu) {
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
+    hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleMobileMenu();
     });
 
     // Close mobile menu when clicking on a link
-    document.querySelectorAll('.nav-link').forEach(link => {
+    navLinks.forEach(link => {
         link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            closeMobileMenu();
         });
     });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeMobileMenu();
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
+}
+
+function toggleMobileMenu() {
+    const isActive = hamburger.classList.contains('active');
+    
+    if (isActive) {
+        closeMobileMenu();
+    } else {
+        openMobileMenu();
+    }
+}
+
+function openMobileMenu() {
+    hamburger.classList.add('active');
+    navMenu.classList.add('active');
+    body.style.overflow = 'hidden';
+    
+    // Set focus to first menu item for accessibility
+    const firstLink = navMenu.querySelector('.nav-link');
+    if (firstLink) {
+        firstLink.focus();
+    }
+    
+    // Add ARIA attributes
+    hamburger.setAttribute('aria-expanded', 'true');
+    navMenu.setAttribute('aria-hidden', 'false');
+}
+
+function closeMobileMenu() {
+    hamburger.classList.remove('active');
+    navMenu.classList.remove('active');
+    body.style.overflow = '';
+    
+    // Reset ARIA attributes
+    hamburger.setAttribute('aria-expanded', 'false');
+    navMenu.setAttribute('aria-hidden', 'true');
+}
+
+// Initialize ARIA attributes
+if (hamburger && navMenu) {
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-controls', 'nav-menu');
+    hamburger.setAttribute('aria-label', 'Toggle navigation menu');
+    navMenu.setAttribute('id', 'nav-menu');
+    navMenu.setAttribute('aria-hidden', 'true');
 }
 
 // ===== SMOOTH SCROLLING =====

@@ -1,5 +1,31 @@
 <?php
 session_start();
+require_once '../config/database.php';
+
+// Security: Regenerate session ID
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Rate limiting: Check login attempts
+$max_attempts = 5;
+$lockout_time = 900; // 15 minutes
+
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['last_attempt'] = 0;
+}
+
+// Check if user is locked out
+if ($_SESSION['login_attempts'] >= $max_attempts) {
+    $time_remaining = $lockout_time - (time() - $_SESSION['last_attempt']);
+    if ($time_remaining > 0) {
+        $error_message = "Terlalu banyak percobaan login. Coba lagi dalam " . ceil($time_remaining / 60) . " menit.";
+    } else {
+        // Reset attempts after lockout period
+        $_SESSION['login_attempts'] = 0;
+    }
+}
 
 // Redirect jika sudah login
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -7,25 +33,91 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
     exit();
 }
 
-$error_message = '';
+$error_message = $error_message ?? '';
 
-if ($_POST) {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    
-    // Kredensial admin (hardcoded - simple)
-    $admin_username = 'admin';
-    $admin_password = 'admin123';
-    
-    if ($username === $admin_username && $password === $admin_password) {
-        $_SESSION['admin_logged_in'] = true;
-        $_SESSION['admin_username'] = $username;
-        header('Location: flora.php');
-        exit();
+if ($_POST && !isset($error_message)) {
+    // CSRF Protection
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error_message = 'Invalid security token. Please try again.';
     } else {
-        $error_message = 'Username atau password salah!';
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        
+        if (!empty($username) && !empty($password)) {
+            // Check if admin_users table exists, if not use fallback
+            if (table_exists($conn, 'admin_users')) {
+                // Database-driven authentication
+                $query = "SELECT id, username, password, full_name, role, is_active, last_login FROM admin_users WHERE username = ? AND is_active = 1";
+                $result = safe_query($conn, $query, [$username]);
+                
+                if ($result && $user = mysqli_fetch_assoc($result)) {
+                    // Verify password
+                    if (password_verify($password, $user['password'])) {
+                        // Login successful
+                        $_SESSION['admin_logged_in'] = true;
+                        $_SESSION['admin_id'] = $user['id'];
+                        $_SESSION['admin_username'] = $user['username'];
+                        $_SESSION['admin_full_name'] = $user['full_name'];
+                        $_SESSION['admin_role'] = $user['role'];
+                        $_SESSION['login_time'] = time();
+                        
+                        // Reset login attempts
+                        $_SESSION['login_attempts'] = 0;
+                        
+                        // Regenerate session ID for security
+                        session_regenerate_id(true);
+                        
+                        // Update last login
+                        $update_query = "UPDATE admin_users SET last_login = NOW() WHERE id = ?";
+                        safe_query($conn, $update_query, [$user['id']]);
+                        
+                        header('Location: flora.php');
+                        exit();
+                    } else {
+                        $error_message = 'Username atau password salah!';
+                        $_SESSION['login_attempts']++;
+                        $_SESSION['last_attempt'] = time();
+                    }
+                } else {
+                    $error_message = 'Username atau password salah!';
+                    $_SESSION['login_attempts']++;
+                    $_SESSION['last_attempt'] = time();
+                }
+            } else {
+                // Fallback to hardcoded credentials if table doesn't exist
+                $admin_username = 'admin';
+                $admin_password = 'admin123';
+                
+                if ($username === $admin_username && $password === $admin_password) {
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $username;
+                    $_SESSION['admin_full_name'] = 'Administrator';
+                    $_SESSION['admin_role'] = 'super_admin';
+                    $_SESSION['login_time'] = time();
+                    
+                    // Reset login attempts
+                    $_SESSION['login_attempts'] = 0;
+                    
+                    // Regenerate session ID for security
+                    session_regenerate_id(true);
+                    
+                    header('Location: flora.php');
+                    exit();
+                } else {
+                    $error_message = 'Username atau password salah!';
+                    $_SESSION['login_attempts']++;
+                    $_SESSION['last_attempt'] = time();
+                }
+            }
+        } else {
+            $error_message = 'Harap isi semua field!';
+        }
     }
+    
+    // Generate new CSRF token after failed attempt
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+?>
 ?>
 
 <!DOCTYPE html>
@@ -69,6 +161,8 @@ if ($_POST) {
                 <?php endif; ?>
                 
                 <form method="POST" class="login-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                    
                     <div class="form-group">
                         <label for="username">
                             <i class="fas fa-user"></i>
@@ -76,7 +170,8 @@ if ($_POST) {
                         </label>
                         <input type="text" id="username" name="username" required 
                                placeholder="Masukkan username admin" 
-                               value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                               value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>"
+                               autocomplete="username">
                     </div>
                     
                     <div class="form-group">
@@ -86,14 +181,15 @@ if ($_POST) {
                         </label>
                         <div class="password-input">
                             <input type="password" id="password" name="password" required 
-                                   placeholder="Masukkan password">
+                                   placeholder="Masukkan password"
+                                   autocomplete="current-password">
                             <button type="button" class="toggle-password" onclick="togglePassword()">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
                     
-                    <button type="submit" class="login-btn">
+                    <button type="submit" class="login-btn" <?php echo isset($error_message) && strpos($error_message, 'Terlalu banyak') !== false ? 'disabled' : ''; ?>>
                         <i class="fas fa-sign-in-alt"></i>
                         Masuk ke Dashboard
                     </button>
